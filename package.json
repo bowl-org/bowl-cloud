@@ -1,0 +1,32 @@
+{
+  "name": "p2p-chat-system-backend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mehmetumit/p2p-chat-system.git"
+  },
+  "keywords": [
+    "NodeJS",
+    "Docker",
+    "Socket"
+  ],
+  "author": "Mehmet Ümit Özden",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mehmetumit/p2p-chat-system/issues"
+  },
+  "homepage": "https://github.com/mehmetumit/p2p-chat-system#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.5.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
