@@ -1,8 +1,12 @@
 const express = require("express");
 const app = express();
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
+const DB_URL = "mongodb://127.0.0.1:27017/p2p_chat"
+const connect = mongoose.connect(DB_URL);
 const HTTP_PORT = 3000;
 const getTimestamp = () => {
   let d = new Date();
@@ -18,6 +22,10 @@ const getTimestamp = () => {
 //const wss = new WebSocket.Server({ server: server }, () => {
   //console.log(`WS server is binded to http server`);
 //});
+connect.then((db) => {
+	console.log('Connected to DB successfully');
+}).catch((err) => console.log(err));
+
 const io = new Server(server, {
   cors: {
     origin: "*",

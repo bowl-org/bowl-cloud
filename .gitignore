@@ -1,7 +1,8 @@
 node_modules
 /dist
 
-
+# database files
+db/data
 # environment variables of containers
 .env
 # local env files
