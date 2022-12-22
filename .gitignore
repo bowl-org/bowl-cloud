@@ -2,6 +2,8 @@ node_modules
 /dist
 
 
+# environment variables of containers
+.env
 # local env files
 .env.local
 .env.*.local

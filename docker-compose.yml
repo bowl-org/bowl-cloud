@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: ./
+    hostname: backend
+    container_name: backend
+    volumes:
+      - ./backend/public:/usr/src/app/public:z
+  db:
+    image: mongo
+    hostname: db
+    container_name: db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - ./db/data:/data/db
