@@ -8,6 +8,11 @@ const { Server } = require("socket.io");
 const DB_URL = "mongodb://127.0.0.1:27017/p2p_chat"
 const connect = mongoose.connect(DB_URL);
 const HTTP_PORT = 3000;
+
+const logInRouter = require("./routes/logInRouter")
+const signUpRouter = require("./routes/signUpRouter")
+const forgotPasswordRouter = require("./routes/forgotPasswordRouter")
+
 const getTimestamp = () => {
   let d = new Date();
   return (
@@ -32,6 +37,15 @@ const io = new Server(server, {
   },
 });
 
+//Middlewares
+//Express body parser
+app.use(express.json())//req.body
+//Sign up router mounted as /signup
+app.use('/signup', signUpRouter);
+//Log in router mounted as /login
+app.use('/login', logInRouter);
+//Forgot password router mounted as /forgotpassword
+app.use('/forgotpassword', forgotPasswordRouter);
 app.get("/", (req, res) => {
   res.send("<h1>P2P Chat Backend</h1>");
 });
