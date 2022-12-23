@@ -14,7 +14,9 @@ services:
     ports:
       - "27017:27017"
     environment:
+      TZ: "Europe/Istanbul"
       MONGO_INITDB_ROOT_USERNAME: ${DB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
     volumes:
       - ./db/data:/data/db

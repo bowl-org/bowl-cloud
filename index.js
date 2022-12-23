@@ -1,11 +1,13 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+require("dotenv").config();
+const env = process.env;
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const DB_URL = "mongodb://127.0.0.1:27017/p2p_chat"
+//${Username}:${Password}@host:port/db_name
+const DB_URL = `mongodb://${env.DB_ROOT_USERNAME}:${env.DB_ROOT_PASSWORD}@${env.DB_HOST}:${env.DB_PORT}/`
 const connect = mongoose.connect(DB_URL);
 const HTTP_PORT = 3000;
 
