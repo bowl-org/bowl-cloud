@@ -1,6 +1,7 @@
 node_modules
 /dist
-
+# TODO list for development
+TODO.md
 # database files
 db/data
 # environment variables of containers

@@ -22,4 +22,22 @@ const newUser = (req, res, next) => {
     }, (err) => next(err))
     .catch((err) => next(err))
 };
-module.exports = { newUser };
+const getAllUsers = (req, res, next) => {
+  userModel.find({})
+    .then((users) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(users);
+    }, (err) => next(err))
+    .catch((err) => next(err))
+}
+const removeAllUsers = (req, res, next) => {
+  userModel.remove({})
+    .then((users) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(users);
+    }, (err) => next(err))
+			.catch((err) => next(err))
+}
+module.exports = { newUser, getAllUsers, removeAllUsers };

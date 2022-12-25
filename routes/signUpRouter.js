@@ -9,18 +9,12 @@ signUpRouter.use(express.json());
 
 signUpRouter
   .route("/")
-  .get((req, res, next) => {
-    res.statusCode = 403;
-    res.end("GET operation not supported on /signup");
-  })
+  .get(signUpController.getAllUsers)
   .post(signUpController.newUser)
   .put((req, res, next) => {
     res.statusCode = 403;
     res.end("PUT operation not supported on /signup");
   })
-  .delete((req, res, next) => {
-    res.statusCode = 403;
-    res.end("DELETE operation not supported on /signup");
-  });
+  .delete(signUpController.removeAllUsers);
 
 module.exports = signUpRouter;
