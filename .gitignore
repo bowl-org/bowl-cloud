@@ -1,5 +1,6 @@
 node_modules
 /dist
+push_to_sv.sh
 # TODO list for development
 TODO.md
 # database files

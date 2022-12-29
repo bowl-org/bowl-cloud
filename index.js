@@ -14,6 +14,7 @@ const HTTP_PORT = 3000;
 const logInRouter = require("./routes/logInRouter")
 const signUpRouter = require("./routes/signUpRouter")
 const forgotPasswordRouter = require("./routes/forgotPasswordRouter")
+//const verifyRouter = require("./routes/verifyRouter")
 
 const getTimestamp = () => {
   let d = new Date();
@@ -48,6 +49,8 @@ app.use('/signup', signUpRouter);
 app.use('/login', logInRouter);
 //Forgot password router mounted as /forgotpassword
 app.use('/forgotpassword', forgotPasswordRouter);
+//Verification router mounted as /verify
+//app.use('/verify', verifyRouter);
 app.get("/", (req, res) => {
   res.send("<h1>P2P Chat Backend</h1>");
 });

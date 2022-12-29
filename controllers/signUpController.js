@@ -1,5 +1,31 @@
-const bcrypt = require("bcrypt")
-const userModel = require("../models/user")
+const bcrypt = require("bcrypt");
+const userModel = require("../models/user");
+const validateEmail = (email) => {
+  if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+    return true;
+  }
+  return false;
+}
+const validatePassword = (password) => {
+  //Minimum 8 character must include at least one uppercase letter
+  if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(password)) {
+    return true;
+  }
+  return false;
+}
+const validateName = (name) => {
+  //Minimum 3 character
+  if (/^.{3,}$/.test(name)){
+    return true;
+  }
+  return false;
+}
+const validatePublicKey = (publicKey) => {
+
+}
+const validateAllFields = (name, password, email, publicKey) => {
+  validateName(name)
+}
 const newUser = (req, res, next) => {
   //res.statusCode = 200;
   //res.setHeader("Content-Type", "application/json");
