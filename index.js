@@ -35,6 +35,7 @@ connect.then((db) => {
 }).catch((err) => console.log(err));
 
 const io = new Server(server, {
+  path: `${env.API_TOKEN}/socket.io`,
   cors: {
     origin: "*",
   },
@@ -44,15 +45,18 @@ const io = new Server(server, {
 //Express body parser
 app.use(express.json())//req.body
 //Sign up router mounted as /signup
-app.use('/signup', signUpRouter);
+app.use(`${env.API_TOKEN}/signup`, signUpRouter);
 //Log in router mounted as /login
-app.use('/login', logInRouter);
+app.use(`${env.API_TOKEN}/login`, logInRouter);
 //Forgot password router mounted as /forgotpassword
-app.use('/forgotpassword', forgotPasswordRouter);
+app.use(`${env.API_TOKEN}/forgotpassword`, forgotPasswordRouter);
 //Verification router mounted as /verify
 //app.use('/verify', verifyRouter);
 app.get("/", (req, res) => {
   res.send("<h1>P2P Chat Backend</h1>");
+});
+app.get(`${env.API_TOKEN}`, (req, res) => {
+  res.send("<h1>P2P Chat Backend With API token</h1>");
 });
 io.on('connection', (socket) => {
   console.log("User connected");
@@ -71,5 +75,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(HTTP_PORT, () => {
-  console.log(`http and ws server listening on ${HTTP_PORT}`);
+  console.log(`http and socket.io server listening on ${HTTP_PORT}`);
 });

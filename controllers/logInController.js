@@ -5,8 +5,8 @@ require("dotenv").config({ path: "../.env" });
 const mailTransporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.TRANSPORTER_MAIL ,
-    pass: process.env.TRANSPORTER_PASS ,
+    user: process.env.TRANSPORTER_MAIL,
+    pass: process.env.TRANSPORTER_PASS,
   },
 });
 const authenticateUser = (req, res, next) => {
@@ -19,7 +19,7 @@ const authenticateUser = (req, res, next) => {
         .compare(body.password, candidateUser.password)
         .then((isValid) => {
           if (isValid) {
-            verificationCode = Math.floor( 1000 + Math.random() * 9000);
+            verificationCode = Math.floor(1000 + Math.random() * 9000);
             console.log(verificationCode);
             link = `http://${req.get("host")}/verify?id=${verificationCode}`;
             mailOptions = {
@@ -35,7 +35,7 @@ const authenticateUser = (req, res, next) => {
                   .json({ msg: "Couldn't sent verification mail!" });
               } else {
                 console.log("Verification mail sent!: ", info);
-                res.status(200).json({msg: "Verification mail sent!"});
+                res.status(200).json({ msg: "Verification mail sent!" });
               }
             });
             //res.statusCode = 200;
