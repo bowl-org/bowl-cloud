@@ -1,5 +1,5 @@
-const verificationTokenModel = require("../models/verificationToken");
-const userModel = require("../models/user");
+const verificationTokenModel = require("../models/entities/verificationToken");
+const userModel = require("../models/entities/user");
 
 const verifyUser = (req, res, next) => {
   verificationTokenModel

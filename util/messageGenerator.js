@@ -1,5 +1,5 @@
 function generateMessage(isFailed, message) {
-  let statusMessage = isFailed ? "FAILED" : "SUCCESS";
+  let statusMessage = isFailed ? "FAILURE" : "SUCCESS";
   return { status: statusMessage, msg: message };
 }
 
