@@ -6,11 +6,11 @@ const {
 require("dotenv").config({ path: "../.env" });
 const uuid = require("uuid");
 
-const genVerificationLink = (userId) => {
+const genVerificationLink = (userId, routePath) => {
   return new Promise((resolve, reject) => {
     //V4 is random
     let token = uuid.v4();
-    let link = `${process.env.BASE_URL}${process.env.API_TOKEN}/verify/${userId}/${token}`;
+    let link = `${process.env.BASE_URL}${process.env.API_TOKEN}${routePath}/${userId}/${token}`;
     let verificationToken = {
       user_id: userId,
       token: token,
@@ -41,8 +41,10 @@ const verifyUser = (verificationData) => {
               console.log("User verified: ", token.user_id);
               verificationTokenDAO
                 .deleteOne(token)
-                .catch((err) =>
+                .catch((err) =>{
+                  console.log(err);
                   reject(new Error("Verification token deletion failed!"))
+                }
                 );
               resolve(token.user_id);
             })
@@ -52,8 +54,7 @@ const verifyUser = (verificationData) => {
         })
         .catch((err) =>
           reject(
-            err
-            //new Error("Verification failed! Verification token not exists!")
+            new Error("Verification failed! Verification token expired or invalid!")
           )
         );
     } catch (err) {

@@ -15,7 +15,7 @@ const signUpNewUser = (userData) => {
         UserDAO.insert(user)
           .then((insertedUser) => {
             verificationService
-              .genVerificationLink(insertedUser.id)
+              .genVerificationLink(insertedUser.id, "/verify")
               .then((link) => {
                 mailService
                   .sendMail(

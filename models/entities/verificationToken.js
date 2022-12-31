@@ -9,6 +9,12 @@ const verificationTokenSchema = new Schema({
   token: {
     type: String,
     required: true
+  },
+  //Token expires after 2 minutes
+  expireAt: {
+    type: Date,
+    default: Date.now,
+    expires: 120 
   }
 });
 

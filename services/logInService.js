@@ -1,6 +1,5 @@
 const encryptionService = require("./encryptionService");
 const validationService = require("./validationService");
-const { mapToUserDTO } = require("../models/dtos/userDto");
 const userDAO = require("../repository/userDAO");
 
 const authenticateUser = (userData) => {

@@ -16,6 +16,13 @@ const genConfirmationOptions = (mailTo, link) => {
     html: `<p>Please click the link to confirm your account.</p><a href="${link}">Click here to verify</a>`,
   };
 }
+const genResetPasswordOptions = (mailTo, name, link) => {
+  return mailOptions = {
+    to: mailTo,
+    subject: "Reset your password",
+    html: `<p>Hello ${name}!</p><p>We have received a password reset request for your account.</p><p>If you did not ask to reset your password, then you can ignore this email and your password will not be reset. The link below will remain active for 2 minutes.</p><a href="${link}">Reset password</a>`,
+  };
+}
 
 const sendMail = (options) => {
   return new Promise((resolve, reject) => {
@@ -38,4 +45,4 @@ const sendMail = (options) => {
     }
   });
 };
-module.exports = { sendMail, genConfirmationOptions };
+module.exports = { sendMail, genConfirmationOptions, genResetPasswordOptions };
