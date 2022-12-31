@@ -4,6 +4,7 @@ const userDAO = require("../repository/userDAO");
 
 const authenticateUser = (userData) => {
   return new Promise((resolve, reject) => {
+    //TODO: validation will be add
     userDAO
       .findOne({ email: userData.email })
       .then((candidateUser) => {

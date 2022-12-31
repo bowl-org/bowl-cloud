@@ -14,15 +14,15 @@ const HTTP_PORT = 3000;
 const logInRouter = require("./routes/logInRouter")
 const signUpRouter = require("./routes/signUpRouter")
 const forgotPasswordRouter = require("./routes/forgotPasswordRouter")
-//const verifyRouter = require("./routes/verifyRouter")
+const verifyRouter = require("./routes/verifyRouter")
 
 const getTimestamp = () => {
   let d = new Date();
   return (
     "[ " +
     d.toLocaleDateString("tr-TR", { timeZone: "Europe/Istanbul" }) +
-    " - " +
-    d.toLocaleTimeString("tr-TR", { timeZone: "Europe/Istanbul" }) +
+    " - "
+    + d.toLocaleTimeString("tr-TR", { timeZone: "Europe/Istanbul" }) +
     " ] "
   );
 };
@@ -51,7 +51,7 @@ app.use(`${env.API_TOKEN}/login`, logInRouter);
 //Forgot password router mounted as /forgotpassword
 app.use(`${env.API_TOKEN}/forgotpassword`, forgotPasswordRouter);
 //Verification router mounted as /verify
-//app.use('/verify', verifyRouter);
+app.use(`${env.API_TOKEN}/verify`, verifyRouter);
 app.get("/", (req, res) => {
   res.send("<h1>P2P Chat Backend</h1>");
 });

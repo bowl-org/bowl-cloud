@@ -1,6 +1,8 @@
 const encryptionService = require("../services/encryptionService");
 const UserDAO = require("../repository/userDAO");
 const validationService = require("./validationService");
+const verificationService = require("./verificationService");
+const mailService = require("./mailService");
 const { mapToUserDTO } = require("../models/dtos/userDto");
 
 const signUpNewUser = (userData) => {
@@ -12,19 +14,39 @@ const signUpNewUser = (userData) => {
         user.password = hash;
         UserDAO.insert(user)
           .then((insertedUser) => {
-            resolve(insertedUser);
+            verificationService
+              .genVerificationLink(insertedUser.id)
+              .then((link) => {
+                mailService
+                  .sendMail(
+                    mailService.genConfirmationOptions(insertedUser.email, link)
+                  )
+                  .then((info) => {
+                    //resolve(insertedUser);
+                    resolve(info);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    reject(err);
+                  });
+              })
+              .catch((err) => {
+                reject(err);
+              });
           })
           .catch((err) => {
             //Mongodb duplicate key error code
             if (err.code == 11000) {
               reject(new Error("Account exists!"));
             } else {
+              console.log(err);
               reject(err);
             }
           });
       });
       //.catch((err) => next(err));
     } catch (err) {
+      console.log(err);
       reject(new Error(err.message));
     }
   });

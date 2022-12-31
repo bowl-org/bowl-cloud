@@ -15,8 +15,8 @@ const findById = (id) => {
 const insert = (userDTO) => {
   return User.create(userDTO);
 }
-const updateById = (id) => {
-  return User.findByIdAndUpdate(id);
+const updateById = (id, data) => {
+  return User.findByIdAndUpdate(id, data);
 }
 
 module.exports = {getAll, findOne, deleteAll, findById, insert, updateById};

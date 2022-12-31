@@ -9,19 +9,23 @@ const mailTransporter = nodemailer.createTransport({
   },
 });
 
-mailOptions = {
-  to: body.email,
-  subject: "Please confirm your account",
-  html: `<p>Please click the link to login your account.</p><a href="${link}">Click here to verify</a>`,
-};
-const sendMail = (to, subject, htmlBody) => {
-  return Promise((resolve, reject) => {
+const genConfirmationOptions = (mailTo, link) => {
+  return mailOptions = {
+    to: mailTo,
+    subject: "Please confirm your account",
+    html: `<p>Please click the link to confirm your account.</p><a href="${link}">Click here to verify</a>`,
+  };
+}
+
+const sendMail = (options) => {
+  return new Promise((resolve, reject) => {
     try {
       mailOptions = {
-        to: to,
-        subject: subject,
-        html: htmlBody,
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
       };
+      console.log(mailOptions.html)
       mailTransporter.sendMail(mailOptions, (err, info) => {
         if (err) {
           reject(err);
@@ -34,4 +38,4 @@ const sendMail = (to, subject, htmlBody) => {
     }
   });
 };
-module.exports = { sendMail };
+module.exports = { sendMail, genConfirmationOptions };
