@@ -1,10 +1,17 @@
 const encryptionService = require("./encryptionService");
+const validationService = require("./validationService");
 const { mapToUserDTO } = require("../models/dtos/userDto");
 const userDAO = require("../repository/userDAO");
 
 const authenticateUser = (userData) => {
   return new Promise((resolve, reject) => {
-    //TODO: validation will be add
+    try{
+      validationService.validateEmail(userData.email);
+      validationService.validatePassword(userData.password);
+    }catch(err){
+      reject(err);
+    }
+    //Check creadentials
     userDAO
       .findOne({ email: userData.email })
       .then((candidateUser) => {
@@ -12,7 +19,11 @@ const authenticateUser = (userData) => {
           .comparePassword(userData.password, candidateUser.password)
           .then((isValid) => {
             if (isValid) {
-              resolve(candidateUser);
+              if(candidateUser.verified){
+                resolve(candidateUser);
+              }else{
+                reject(new Error("User not verified! Check your mail inbox for verification link"));
+              }
             } else {
               reject(new Error("Invalid credentials!"));
             }

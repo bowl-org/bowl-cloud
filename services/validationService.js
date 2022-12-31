@@ -2,21 +2,21 @@ const validateEmail = (email) => {
   if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
     return;
   }
-  throw new Error("Email validation failed!");
+  throw new Error("Email validation failed! Invalid email pattern!");
 };
 const validatePassword = (password) => {
   //Minimum 8 character must include at least one uppercase letter
   if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(password)) {
     return;
   }
-  throw new Error("Password validation failed!");
+  throw new Error("Password validation failed! Password must be at least 8 characters long contain a number and an uppercase letter.");
 };
 const validateName = (name) => {
   //Minimum 3 character
   if (/^.{3,}$/.test(name)) {
     return;
   }
-  throw new Error("Name validation failed!");
+  throw new Error("Name validation failed! Name must be at least 3 characters long.");
 };
 const validatePublicKey = (publicKey) => {
   //TODO
@@ -32,4 +32,4 @@ const validateUser = (user) => {
     throw err;
   }
 };
-module.exports = {validateUser};
+module.exports = {validateUser, validatePassword, validateEmail};
