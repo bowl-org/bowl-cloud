@@ -8,7 +8,6 @@ const findOne = (userDTO) => {
     User.findOne(userDTO).then((user) => {
       //null or undefined
       if (user == null) {
-        console.log("User  not found DAO");
         reject(new Error("User not found!"));
       } else {
         resolve(user);

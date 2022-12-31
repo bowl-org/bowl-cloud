@@ -1,0 +1,8 @@
+./docker-compose.yml
+./db/data*
+./.git*
+./.gitignore
+./node_modules*
+./out.tar
+./push_to_sv.sh
+./TODO.md

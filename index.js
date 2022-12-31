@@ -9,7 +9,7 @@ const { Server } = require("socket.io");
 //${Username}:${Password}@host:port/db_name
 const DB_URL = `mongodb://${env.DB_ROOT_USERNAME}:${env.DB_ROOT_PASSWORD}@${env.DB_HOST}:${env.DB_PORT}/`
 const connect = mongoose.connect(DB_URL);
-const HTTP_PORT = 3000;
+const HTTP_PORT = env.HTTP_PORT;
 
 const logInRouter = require("./routes/logInRouter")
 const signUpRouter = require("./routes/signUpRouter")

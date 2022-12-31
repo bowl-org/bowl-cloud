@@ -72,7 +72,6 @@ const resetPassword = (verificationTokenData, newPasswordData) => {
               });
           })
           .catch((err) => {
-            console.log(err);
             reject(err);
           });
       })

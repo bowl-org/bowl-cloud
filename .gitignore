@@ -6,7 +6,7 @@ TODO.md
 # database files
 db/data
 # environment variables of containers
-.env
+.env*
 # local env files
 .env.local
 .env.*.local
