@@ -46,7 +46,6 @@ const signUpNewUser = (userData) => {
       });
       //.catch((err) => next(err));
     } catch (err) {
-      console.log(err);
       reject(new Error(err.message));
     }
   });

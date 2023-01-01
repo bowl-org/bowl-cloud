@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
+const cors = require("cors");
 require("dotenv").config();
 const env = process.env;
 const http = require("http");
@@ -44,6 +45,7 @@ const io = new Server(server, {
 //Middlewares
 //Express body parser
 app.use(express.json())//req.body
+app.use(cors())
 //Sign up router mounted as /signup
 app.use(`${env.API_TOKEN}/signup`, signUpRouter);
 //Log in router mounted as /login

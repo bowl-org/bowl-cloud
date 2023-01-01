@@ -9,7 +9,7 @@ const validatePassword = (password) => {
   if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(password)) {
     return;
   }
-  throw new Error("Password validation failed! Password must be at least 8 characters long contain a number and an uppercase letter.");
+  throw new Error("Password must be at least 8 characters long contain a number and an uppercase letter.");
 };
 const validateName = (name) => {
   //Minimum 3 character
