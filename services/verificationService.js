@@ -29,8 +29,6 @@ const genVerificationLink = (userId, routePath) => {
 const verifyUser = (verificationData) => {
   return new Promise((resolve, reject) => {
     let verificationToken = mapToVerificationTokenDTO(verificationData);
-    console.log("Verify User:");
-    console.log(verificationToken);
     try {
       verificationTokenDAO
         .findOne(verificationToken)

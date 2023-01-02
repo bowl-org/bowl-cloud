@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Account Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+<% if(success){ %>
+    <div
+      id="success-container"
+      class="h-screen bg-neutral-300 grow flex flex-col justify-center self-center items-center space-y-5"
+    >
+      <h1 class="text-6xl text-center font-medium light-purple">
+        Account verified successfully!
+      </h1>
+      <span id="checkmark-success"> </span>
+    </div>
+    <style>
+      #checkmark-success {
+        display: inline-block;
+        width: 6rem;
+        height: 6rem;
+        background: #7bb636;
+        border-radius: 50%;
+        -ms-transform: rotate(45deg); /* IE 9 */
+        -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+        transform: rotate(45deg);
+      }
+
+      #checkmark-success:before {
+        content: "";
+        position: absolute;
+        width: 1rem;
+        height: 2rem;
+        background-color: #fff;
+        left: 3rem;
+        top: 1.2rem;
+      }
+
+      #checkmark-success:after {
+        content: "";
+        position: absolute;
+        width: 2rem;
+        height: 1rem;
+        background-color: #fff;
+        left: 2rem;
+        top: 3rem;
+      }
+      .light-purple {
+        color: #7b7d9e;
+      }
+    </style>
+<% } else{ %>
+    <div
+      id="error-container"
+      class="h-screen bg-neutral-300 grow flex flex-col justify-center self-center items-center space-y-5"
+    >
+      <h1 class="text-6xl text-center font-medium light-purple">
+        Account verification failed!
+      </h1>
+      <h2 id="response-err-msg" class="font-bold text-xl"><%=msg%></h2>
+      <span id="checkmark-failure"> </span>
+    </div>
+    <style>
+      #checkmark-failure {
+        display: inline-block;
+        width: 6rem;
+        height: 6rem;
+        background: #eb3941;
+        border-radius: 50%;
+        -ms-transform: rotate(45deg); /* IE 9 */
+        -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+        transform: rotate(45deg);
+      }
+
+      #checkmark-failure:before {
+        content: "";
+        position: absolute;
+        width: 1rem;
+        height: 4rem;
+        background-color: #fff;
+        left: 2.5rem;
+        top: 1rem;
+      }
+
+      #checkmark-failure:after {
+        content: "";
+        position: absolute;
+        width: 4rem;
+        height: 1rem;
+        background-color: #fff;
+        left: 1rem;
+        top: 2.5rem;
+      }
+
+      .light-purple {
+        color: #7b7d9e;
+      }
+    </style>
+ <% } %>
+  </body>
+</html>

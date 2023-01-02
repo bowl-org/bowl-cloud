@@ -3,13 +3,19 @@ const { generateMessage } = require("../util/messageGenerator");
 
 const verifyUser = (req, res, next) => {
   let verificationData = req.params;
-  res.setHeader("Content-Type", "application/json");
   verificationService.verifyUser(verificationData)
     .then((user_id) => {
-      res.status(200).json(generateMessage(false, `User verified! user_id:${user_id}`));
+      //res.status(200).json(generateMessage(false, `User verified! user_id:${user_id}`));
+      res.status(200).render('../views/pages/verifyUser',{
+        success: true
+      });
     })
     .catch((err) => {
-      res.status(400).json(generateMessage(true, err.message));
+      //res.status(400).json(generateMessage(true, err.message));
+      res.status(400).render('../views/pages/verifyUser', {
+        success: false,
+        msg: err.message
+      })
     });
 };
 //DEV
