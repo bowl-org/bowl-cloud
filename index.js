@@ -11,6 +11,8 @@ const { Server } = require("socket.io");
 const DB_URL = `mongodb://${env.DB_ROOT_USERNAME}:${env.DB_ROOT_PASSWORD}@${env.DB_HOST}:${env.DB_PORT}/`
 const connect = mongoose.connect(DB_URL);
 const HTTP_PORT = env.HTTP_PORT;
+//DEV
+const reload = require('reload');
 
 const logInRouter = require("./routes/logInRouter")
 const signUpRouter = require("./routes/signUpRouter")
@@ -46,6 +48,8 @@ const io = new Server(server, {
 //Express body parser
 app.use(express.json())//req.body
 app.use(cors())
+//View engine
+app.set('view engine', 'ejs')
 //Sign up router mounted as /signup
 app.use(`${env.API_TOKEN}/signup`, signUpRouter);
 //Log in router mounted as /login
@@ -79,3 +83,5 @@ io.on('connection', (socket) => {
 server.listen(HTTP_PORT, () => {
   console.log(`http and socket.io server listening on ${HTTP_PORT}`);
 });
+//DEV
+reload(app);

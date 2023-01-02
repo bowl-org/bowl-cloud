@@ -60,11 +60,10 @@ const resetPassword = (verificationTokenData, newPasswordData) => {
             userDAO
               .updateById(token.user_id, { password: hash })
               .then((user) => {
-                console.log("Password reset: ", user);
                 verificationTokenDAO.deleteOne(token).catch((err) => {
                   console.log(err);
-                  reject(new Error("Verification token deletion failed!"))
-                })
+                  reject(new Error("Verification token deletion failed!"));
+                });
                 resolve(user);
               })
               .catch((err) => {

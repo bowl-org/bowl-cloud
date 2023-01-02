@@ -63,6 +63,23 @@ const verifyUser = (verificationData) => {
     }
   });
 };
+const verifyToken = (verificationTokenData) => {
+  return new Promise((resolve, reject) => {
+    let verificationToken = mapToVerificationTokenDTO(verificationTokenData);
+    verificationTokenDAO
+      .findOne(verificationToken)
+      .then((token) => {
+        resolve(token)
+      })
+      .catch((err) => {
+        reject(
+          new Error(
+            "Verification token expired or invalid!"
+          )
+        );
+      });
+  })
+}
 //DEV
 const getAllTokens = () => {
   return verificationTokenDAO.getAll().catch((err) => {
@@ -75,4 +92,4 @@ const removeAllTokens = () => {
     throw new Error(err.message);
   });
 };
-module.exports = { verifyUser, genVerificationLink, getAllTokens, removeAllTokens };
+module.exports = { verifyUser, verifyToken, genVerificationLink, getAllTokens, removeAllTokens };

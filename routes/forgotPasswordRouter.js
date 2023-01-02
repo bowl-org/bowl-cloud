@@ -27,12 +27,7 @@ forgotPasswordRouter
   });
 forgotPasswordRouter
   .route("/resetpassword/:user_id/:token")
-  .get((req, res, next) => {
-    //Not supported status code
-    res
-      .status(403)
-      .json(generateMessage(true, "GET operation not supported on /forgotpassword/resetpassword"));
-  })
+  .get(forgotPasswordController.redirecResetPasswordPage)
   .post(forgotPasswordController.resetPassword)
   .put((req, res, next) => {
     res
