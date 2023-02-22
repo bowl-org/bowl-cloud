@@ -4,5 +4,5 @@
 ./.gitignore
 ./node_modules*
 ./out.tar
-./push_to_sv.sh
+./deploy.sh
 ./TODO.md
