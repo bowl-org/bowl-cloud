@@ -1,5 +1,5 @@
 {
-  "name": "p2p-chat-system-backend",
+  "name": "bowl-cloud",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mehmetumit/p2p-chat-system.git"
+    "url": "git+https://github.com/bowl-org/bowl-cloud.git"
   },
   "keywords": [
     "NodeJS",
@@ -19,9 +19,9 @@
   "author": "Mehmet Ümit Özden",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mehmetumit/p2p-chat-system/issues"
+    "url": "https://github.com/bowl-org/bowl-cloud/issues"
   },
-  "homepage": "https://github.com/mehmetumit/p2p-chat-system#readme",
+  "homepage": "https://github.com/bowl-org/bowl-cloud#readme",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
