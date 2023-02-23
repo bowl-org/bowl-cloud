@@ -1,0 +1,31 @@
+name: CI/CD
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup SSH Keys and known_hosts
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          # private key is never written to disk
+          ssh-agent -a "$SSH_AUTH_SOCK" > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_KEY }}"
+          # make sure .ssh folder exists
+          mkdir -p ~/.ssh && echo "${{ secrets.KNOWN_HOSTS }}" > "$HOME/.ssh/known_hosts"
+      - name: Initialize production environment variables
+        run: |
+          # deployment script will handle rest of it
+          echo "${{ secrets.ENV_PROD }}" > ./.env.prod
+      - name: Deploy
+        env:
+          sv: ${{ secrets.SV }}
+          host: ${{ secrets.HOST }}
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          pass: ${{ secrets.PASS }}
+        run: |
+          ./deploy.sh
