@@ -8,7 +8,7 @@ services:
   #volumes:
   #- ./backend/public:/usr/src/app/public:z
   db:
-    image: mongo
+    image: mongo:4.4
     hostname: db
     container_name: db
     ports:
