@@ -2,6 +2,8 @@ node_modules
 /dist
 # TODO list for development
 TODO.md
+# Vim session
+Session.vim
 # database files
 db/data
 # environment variables of containers

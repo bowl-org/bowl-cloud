@@ -1,13 +1,14 @@
 const encryptionService = require("./encryptionService");
 const validationService = require("./validationService");
 const userDAO = require("../repository/userDAO");
+const authTokenService = require("./authTokenService");
 
 const authenticateUser = (userData) => {
   return new Promise((resolve, reject) => {
-    try{
+    try {
       validationService.validateEmail(userData.email);
       validationService.validatePassword(userData.password);
-    }catch(err){
+    } catch (err) {
       reject(err);
     }
     //Check creadentials
@@ -18,10 +19,22 @@ const authenticateUser = (userData) => {
           .comparePassword(userData.password, candidateUser.password)
           .then((isValid) => {
             if (isValid) {
-              if(candidateUser.verified){
-                resolve(candidateUser);
-              }else{
-                reject(new Error("User not verified! Check your mail inbox for verification link"));
+              if (candidateUser.verified) {
+                authTokenService
+                  .generateAuthToken(candidateUser)
+                  .then((token) => {
+                    resolve(token);
+                  })
+                  .catch((err) => {
+                    reject(err);
+                  });
+              } else {
+              //TODO resend verification link
+                reject(
+                  new Error(
+                    "User not verified! Check your mail inbox for verification link"
+                  )
+                );
               }
             } else {
               reject(new Error("Invalid credentials!"));

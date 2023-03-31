@@ -6,11 +6,13 @@ const authenticateUser = (req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   logInService
     .authenticateUser(body)
-    .then((user) => {
-      res.status(200).json(generateMessage(false,"Authentication success!" ));
+    .then((token) => {
+      res
+        .status(200)
+        .json(generateMessage(false, "Authentication success!", token));
     })
     .catch((err) => {
-      res.status(400).json(generateMessage(true,err.message));
+      res.status(400).json(generateMessage(true, err.message));
     });
 };
 module.exports = { authenticateUser };
