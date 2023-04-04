@@ -6,10 +6,10 @@ const authenticateUser = (req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   logInService
     .authenticateUser(body)
-    .then((token) => {
+    .then((authData) => {
       res
         .status(200)
-        .json(generateMessage(false, "Authentication success!", token));
+        .json({...generateMessage(false, "Authentication success!", authData.token), user: authData.user});
     })
     .catch((err) => {
       res.status(400).json(generateMessage(true, err.message));

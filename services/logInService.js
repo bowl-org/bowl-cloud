@@ -23,13 +23,20 @@ const authenticateUser = (userData) => {
                 authTokenService
                   .generateAuthToken(candidateUser)
                   .then((token) => {
-                    resolve(token);
+                    let authData = {
+                      token: token,
+                      user: {
+                        publicKey: candidateUser.public_key,
+                        name: candidateUser.name,
+                      },
+                    };
+                    resolve(authData);
                   })
                   .catch((err) => {
                     reject(err);
                   });
               } else {
-              //TODO resend verification link
+                //TODO resend verification link
                 reject(
                   new Error(
                     "User not verified! Check your mail inbox for verification link"

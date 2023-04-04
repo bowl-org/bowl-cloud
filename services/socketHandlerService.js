@@ -18,7 +18,6 @@ const initSocket = (io) => {
   io.use(authSocketMiddleware);
   io.on("connection", (socket) => {
     console.log("User connected");
-    socket.broadcast.emit("online");
     socket.on("online", (data) => {
       //Data is only friend name for now
       socket.broadcast.emit("online", data);
