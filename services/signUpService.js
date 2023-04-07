@@ -50,16 +50,5 @@ const signUpNewUser = (userData) => {
     }
   });
 };
-//DEV
-const getAllUsers = () => {
-  return UserDAO.getAll().catch((err) => {
-    throw new Error(err.message);
-  });
-};
-//DEV
-const removeAllUsers = () => {
-  return UserDAO.deleteAll().catch((err) => {
-    throw new Error(err.message);
-  });
-};
-module.exports = { signUpNewUser, getAllUsers, removeAllUsers };
+
+module.exports = { signUpNewUser };

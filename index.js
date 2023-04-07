@@ -19,6 +19,7 @@ const logInRouter = require("./routes/logInRouter");
 const signUpRouter = require("./routes/signUpRouter");
 const forgotPasswordRouter = require("./routes/forgotPasswordRouter");
 const verifyRouter = require("./routes/verifyRouter");
+const userRouter = require("./routes/userRouter");
 
 // We will not pass endpoint from nginx, api key will be handled in nginx side
 //const wss = new WebSocket.Server({ server: server }, () => {
@@ -52,6 +53,8 @@ app.use(`${env.API_TOKEN}/login`, logInRouter);
 app.use(`${env.API_TOKEN}/forgotpassword`, forgotPasswordRouter);
 //Verification router mounted as /verify
 app.use(`${env.API_TOKEN}/verify`, verifyRouter);
+// User router mounted as /user
+app.use(`${env.API_TOKEN}/user`, userRouter);
 app.get("/", (req, res) => {
   res.send("<h1>P2P Chat Backend</h1>");
 });

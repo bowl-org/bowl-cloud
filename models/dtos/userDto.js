@@ -5,7 +5,7 @@ const mapToUserDTO = (userData) => {
       //Check for undefined
       name: userData.name?.trim(),
       email: userData.email?.trim(),
-      password: userData.password,
+      password: userData?.password,
       public_key: userData.public_key?.trim(),
     };
     return user;

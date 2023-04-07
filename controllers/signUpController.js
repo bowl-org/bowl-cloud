@@ -10,23 +10,5 @@ const signUpNewUser = (req, res, next) => {
     res.status(400).json(generateMessage(true, err.message));
   });
 };
-//DEV
-const getAllUsers = (req, res, next) => {
-  res.setHeader("Content-Type", "application/json");
-  signUpService.getAllUsers()
-    .then((users) => {
-      res.status(200).json(users);
-    })
-    .catch((err) => res.status(400).json(generateMessage(true, err.message)));
-};
-//DEV
-const removeAllUsers = (req, res, next) => {
-  res.setHeader("Content-Type", "application/json");
-  signUpService.removeAllUsers()
-    .then((users) => {
-      res.status(200).json(generateMessage(false, "All users deleted!"));
-    })
-    .catch((err) => res.status(400).json(generateMessage(true, err.message)));
-};
 
-module.exports = { signUpNewUser, getAllUsers, removeAllUsers };
+module.exports = { signUpNewUser };

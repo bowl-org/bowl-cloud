@@ -9,13 +9,11 @@ signUpRouter.use(express.json());
 
 signUpRouter
   .route("/")
-  .get(signUpController.getAllUsers)
   .post(signUpController.signUpNewUser)
   .put((req, res, next) => {
     res
       .status(403)
       .json(messageGenerator(true, "PUT operation not supported on /signup"));
-  })
-  .delete(signUpController.removeAllUsers);
+  });
 
 module.exports = signUpRouter;
