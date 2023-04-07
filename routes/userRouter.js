@@ -7,18 +7,27 @@ const userRouter = express.Router();
 //Body parser
 userRouter.use(express.json());
 
-userRouter.route('/')
-    .get(userController.getAllUsers)
-    .post((req, res, next) => {
-        res
-            .status(403)
-            .json(messageGenerator(true, "POST operation not supported on /user"));
-    })
-    .put((req, res, next) => {
-        res
-            .status(403)
-            .json(messageGenerator(true, "PUT operation not supported on /user"));
-    })
-    .delete(userController.removeAllUsers);
+userRouter
+  .route("/")
+  .get(userController.getAllUsers)
+  .post((req, res, next) => {
+    res
+      .status(403)
+      .json(messageGenerator(true, "POST operation not supported on /user"));
+  })
+  .put((req, res, next) => {
+    res
+      .status(403)
+      .json(messageGenerator(true, "PUT operation not supported on /user"));
+  })
+  .delete(userController.removeAllUsers);
 
-userRouter.get('/getPublicKeyWithEmail/:email', userController.getUserPublicKey);
+userRouter.get(
+  "/getPublicKeyWithEmail",
+  userController.getUserPublicKey
+);
+userRouter.get(
+  "/getUserByUserId",
+  userController.getUserByUserId
+);
+module.exports = userRouter;
