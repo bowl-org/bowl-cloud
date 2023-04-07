@@ -3,19 +3,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const contactSchema = new Schema({
-  contact_public_key: {
-    type: String,
-    required: true,
-  },
-});
-const groupSchema = new Schema({
-  //TODO
-});
-const conversationSchema = new Schema({
-  contacts: [contactSchema],
-  groups: [groupSchema],
-});
 const userSchema = new Schema({
   public_key: {
     type: String,
@@ -36,12 +23,15 @@ const userSchema = new Schema({
   },
   verified: {
     type: Boolean,
-    default: false
+    default: false,
   },
-  active_conversations: [conversationSchema],
+  isOnline: {
+    type: Boolean,
+    default: false,
+  },
+  //active_conversations: [conversationSchema],
 });
-
 var User = mongoose.model("User", userSchema);
 var schemaObj = userSchema.obj;
 //Export schema obj
-module.exports = {User, schemaObj};
+module.exports = { User, schemaObj };
