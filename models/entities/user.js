@@ -25,10 +25,6 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  isOnline: {
-    type: Boolean,
-    default: false,
-  },
   //active_conversations: [conversationSchema],
 });
 var User = mongoose.model("User", userSchema);

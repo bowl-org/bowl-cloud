@@ -30,4 +30,8 @@ userRouter.get(
   "/getUserByUserId",
   userController.getUserByUserId
 );
+userRouter.get(
+  "/generateUnlimitedAuthToken",
+  userController.generateUnlimitedAuthToken
+);
 module.exports = userRouter;

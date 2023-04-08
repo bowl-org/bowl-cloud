@@ -7,7 +7,7 @@ const generateAuthToken = (user) => {
     let payload = {
       userId: user.id,
     };
-    jwt.sign(payload, env.SECRET_KEY, {expiresIn: '1w'}, (err, token) => {
+    jwt.sign(payload, env.SECRET_KEY, { expiresIn: "1w" }, (err, token) => {
       if (err) {
         reject(new Error("Auth token generation error!"));
       } else {
@@ -28,5 +28,20 @@ const verifyAuthToken = (token) => {
     });
   });
 };
+//DEV
+const generateUnlimitedToken = (user) => {
+  return new Promise((resolve, reject) => {
+    let payload = {
+      userId: user.id,
+    };
+    return jwt.sign(payload, env.SECRET_KEY, (err, token) => {
+      if (err) {
+        reject(new Error("Auth token generation error!"));
+      } else {
+        resolve(token);
+      }
+    });
+  });
+};
 
-module.exports = { generateAuthToken, verifyAuthToken };
+module.exports = { generateAuthToken, verifyAuthToken, generateUnlimitedToken };

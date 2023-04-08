@@ -1,4 +1,5 @@
 const UserDAO = require("../repository/userDAO");
+const authTokenService = require("../services/authTokenService");
 const { mapToUserDTO } = require("../models/dtos/userDto");
 
 const getAllUsers = () => {
@@ -32,11 +33,39 @@ const getUserByUserId = (userId) => {
     throw new Error(err.message);
   });
 };
-
+const getUserByEmail = (email) => {
+  return UserDAO.findOne({
+    email: email,
+  }).catch((err) => {
+    throw new Error(err.message);
+  });
+};
+const generateUnlimitedAuthTokenByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    UserDAO.findOne({
+      email: email,
+    })
+      .then((user) => {
+        authTokenService
+          .generateUnlimitedToken(user)
+          .then((token) => {
+            resolve(token);
+          })
+          .catch((err) => {
+            reject(new Error(err.message));
+          });
+      })
+      .catch((err) => {
+        reject(new Error(err.message));
+      });
+  });
+};
 module.exports = {
   getAllUsers,
   removeAllUsers,
   removeUserByEmail,
   getUserPublicKey,
   getUserByUserId,
+  getUserByEmail,
+  generateUnlimitedAuthTokenByEmail,
 };
