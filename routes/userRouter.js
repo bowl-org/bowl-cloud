@@ -20,7 +20,7 @@ userRouter
       .status(403)
       .json(messageGenerator(true, "PUT operation not supported on /user"));
   })
-  .delete(userController.removeAllUsers);
+  .delete(userController.removeUserByEmail);
 
 userRouter.get(
   "/getPublicKeyWithEmail",

@@ -12,6 +12,11 @@ const removeAllUsers = () => {
     throw new Error(err.message);
   });
 };
+const removeUserByEmail = (email) => {
+  return UserDAO.deleteByEmail(email).catch((err) => {
+    throw new Error(err.message);
+  });
+};
 
 const getUserPublicKey = (email) => {
   return UserDAO.findOne({
@@ -31,6 +36,7 @@ const getUserByUserId = (userId) => {
 module.exports = {
   getAllUsers,
   removeAllUsers,
+  removeUserByEmail,
   getUserPublicKey,
   getUserByUserId,
 };
