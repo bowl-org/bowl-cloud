@@ -6,6 +6,7 @@ const generateAuthToken = (user) => {
   return new Promise((resolve, reject) => {
     let payload = {
       userId: user.id,
+      email: user.email,
     };
     jwt.sign(payload, env.SECRET_KEY, { expiresIn: "1w" }, (err, token) => {
       if (err) {
@@ -43,5 +44,17 @@ const generateUnlimitedToken = (user) => {
     });
   });
 };
+const getUserIdFromToken = (token) => {
+  return jwt.decode(token)?.userId;
+};
+const getUserEmailFromToken = (token) => {
+  return jwt.decode(token)?.email;
+};
 
-module.exports = { generateAuthToken, verifyAuthToken, generateUnlimitedToken };
+module.exports = {
+  generateAuthToken,
+  verifyAuthToken,
+  generateUnlimitedToken,
+  getUserIdFromToken,
+  getUserEmailFromToken,
+};

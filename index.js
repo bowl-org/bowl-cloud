@@ -19,7 +19,6 @@ const signUpRouter = require("./routes/signUpRouter");
 const forgotPasswordRouter = require("./routes/forgotPasswordRouter");
 const verifyRouter = require("./routes/verifyRouter");
 const userRouter = require("./routes/userRouter");
-const conversationRouter = require("./routes/conversationRouter");
 
 // We will not pass endpoint from nginx, api key will be handled in nginx side
 //const wss = new WebSocket.Server({ server: server }, () => {
@@ -47,8 +46,6 @@ app.use(`${env.API_TOKEN}/forgotpassword`, forgotPasswordRouter);
 app.use(`${env.API_TOKEN}/verify`, verifyRouter);
 // User router mounted as /user
 app.use(`${env.API_TOKEN}/user`, userRouter);
-// Conversation router mounted as /conversation
-app.use(`${env.API_TOKEN}/conversation`, conversationRouter);
 app.get("/", (req, res) => {
   res.send("<h1>Bowl Backend</h1>");
 });

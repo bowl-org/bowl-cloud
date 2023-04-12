@@ -30,7 +30,7 @@ userRouter.get(
   "/getUserByUserId",
   userController.getUserByUserId
 );
-userRouter.get(
+userRouter.post(
   "/generateUnlimitedAuthToken",
   userController.generateUnlimitedAuthToken
 );
