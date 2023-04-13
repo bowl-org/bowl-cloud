@@ -68,6 +68,9 @@ const handleConnection = () => {
     }
     connectedUsers[connectedUserEmail] = socket;
     console.log("Connected users:", connectedUsers);
+    //buffer check
+    //contact requests
+    //socket.emit("contactRequestReceived", senderData);
     handleEvents(socket);
   });
 };
