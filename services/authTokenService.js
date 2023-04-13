@@ -34,6 +34,7 @@ const generateUnlimitedToken = (user) => {
   return new Promise((resolve, reject) => {
     let payload = {
       userId: user.id,
+      email: user.email,
     };
     return jwt.sign(payload, env.SECRET_KEY, (err, token) => {
       if (err) {

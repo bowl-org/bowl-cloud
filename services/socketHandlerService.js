@@ -70,6 +70,7 @@ const handleConnection = () => {
     console.log("Connected users:", connectedUsers);
     //buffer check
     //contact requests
+    //contactBuffer
     //socket.emit("contactRequestReceived", senderData);
     handleEvents(socket);
   });
