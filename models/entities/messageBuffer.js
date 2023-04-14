@@ -10,6 +10,10 @@ const messageBufferSchema = new Schema({
     type: String,
     required: true,
   },
+  sender_email: {
+    type: String,
+    required: true,
+  },
 });
 let messageBuffer = mongoose.model("messageBuffer", messageBufferSchema);
 let schemaObj = messageBuffer.obj;

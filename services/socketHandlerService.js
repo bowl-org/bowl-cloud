@@ -3,6 +3,7 @@ require("dotenv").config();
 const env = process.env;
 const authTokenService = require("./authTokenService");
 const userService = require("./userService");
+// const messageBufferC
 
 //Make sure same socketio instance between modules
 let io;
@@ -43,6 +44,9 @@ const handleEvents = (socket) => {
   socket.on("chatMessage", (data) => {
     console.log(data);
     socket.broadcast.emit("chatMessage", data);
+    /*messageBufferController.sendMessage()
+    .then(())
+    */
   });
   socket.on("disconnect", () => {
     console.log("User disconnected");
@@ -83,7 +87,7 @@ const acceptContactRequestEventHandler = async (socket) => {
       "From: ",
       socketUserEmail,
       "To: ",
-      data.email
+      JSON.parse(data).email
     );
   });
 };
@@ -95,14 +99,17 @@ const declineContactRequestEventHandler = async (socket) => {
       "From: ",
       socketUserEmail,
       "To: ",
-      data.email
+      JSON.parse(data).email
     );
   });
 };
 const contactRequestEventHandler = async (socket) => {
   socket.on("sendContactRequest", async (data, callback) => {
     let socketUserEmail = getEmailFromSocket(socket);
-    let contactEmail = data?.email;
+    let contactEmail = JSON.parse(data)?.email;
+    //JSON.parse(JSON.stringify(msgData));
+    console.log("Data: ", typeof data);
+    console.log("Contact email: ", contactEmail);
     try {
       //Check user is exists or not
       await userService.getUserByEmail(contactEmail);
