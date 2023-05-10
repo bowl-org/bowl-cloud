@@ -59,6 +59,16 @@ const removeUserByEmail = (req, res, next) => {
     .catch((err) => res.status(400).json(generateMessage(true, err.message)));
 };
 
+const updateUserKeyByEmail = (req, res, next) => {
+  res.setHeader("Content-Type", "application/json");
+  userService
+    .updateUserKeyByEmail(req.body.email,req.body.public_key)
+    .then(() => {
+      res.status(200).json(generateMessage(false, "User public key updated!"));
+    })
+    .catch((err) => res.status(400).json(generateMessage(true, err.message)));
+};
+
 module.exports = {
   getAllUsers,
   getUserPublicKey,
@@ -66,4 +76,5 @@ module.exports = {
   generateUnlimitedAuthToken,
   removeAllUsers,
   removeUserByEmail,
+  updateUserKeyByEmail,
 };

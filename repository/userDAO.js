@@ -19,7 +19,7 @@ const deleteAll = () => {
   return User.remove({});
 };
 const deleteByEmail = (email) => {
-  return User.remove({email: email});
+  return User.remove({ email: email });
 };
 const findById = (id) => {
   return User.findById(id);
@@ -30,5 +30,18 @@ const insert = (userDTO) => {
 const updateById = (id, data) => {
   return User.findByIdAndUpdate(id, data);
 };
+const updateByEmail = async (email, data) => {
+  let user = await findOne({ email: email });
+  return User.findByIdAndUpdate(user.id, data);
+};
 
-module.exports = { getAll, findOne, deleteAll, deleteByEmail, findById, insert, updateById };
+module.exports = {
+  getAll,
+  findOne,
+  deleteAll,
+  deleteByEmail,
+  findById,
+  insert,
+  updateById,
+  updateByEmail
+};

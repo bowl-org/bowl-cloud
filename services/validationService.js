@@ -1,3 +1,4 @@
+const keyService = require("./keyService")
 const validateEmail = (email) => {
   if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
     return;
@@ -18,10 +19,7 @@ const validateName = (name) => {
   }
   throw new Error("Name validation failed! Name must be at least 3 characters long.");
 };
-const validatePublicKey = (publicKey) => {
-  //TODO
-  return;
-};
+const validatePublicKey = keyService.validatePublicKey;
 const validateUser = (user) => {
   try {
     validateEmail(user.email);
@@ -32,4 +30,4 @@ const validateUser = (user) => {
     throw err;
   }
 };
-module.exports = {validateUser, validatePassword, validateEmail};
+module.exports = {validateUser, validatePassword, validateEmail, validatePublicKey};
