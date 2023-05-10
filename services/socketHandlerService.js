@@ -3,6 +3,9 @@ require("dotenv").config();
 const env = process.env;
 const authTokenService = require("./authTokenService");
 const userService = require("./userService");
+const privateChatService = require("./privateChatService");
+const { mapToUserDTO } = require("../models/dtos/userDto");
+// const messageBufferC
 
 //Make sure same socketio instance between modules
 let io;
@@ -22,6 +25,15 @@ const authSocketMiddleware = (socket, next) => {
       next(err);
     });
 };
+//const socketDataParserMiddleware = (socket, next) => {
+//try {
+//console.log("DATA PARSER TEST:",socket.data);
+//next();
+//} catch (err) {
+//next(err);
+//}
+//};
+//const parseSocketData = (data) => JSON.parse(data)
 
 const initSocket = (server) => {
   io = new Server(server, {
@@ -33,6 +45,7 @@ const initSocket = (server) => {
   });
   //Use authentication middleware
   io.use(authSocketMiddleware);
+
   handleConnection();
 };
 const handleEvents = (socket) => {
@@ -43,6 +56,9 @@ const handleEvents = (socket) => {
   socket.on("chatMessage", (data) => {
     console.log(data);
     socket.broadcast.emit("chatMessage", data);
+    /*messageBufferController.sendMessage()
+    .then(())
+    */
   });
   socket.on("disconnect", () => {
     console.log("User disconnected");
@@ -52,6 +68,7 @@ const handleEvents = (socket) => {
   contactRequestEventHandler(socket);
   acceptContactRequestEventHandler(socket);
   declineContactRequestEventHandler(socket);
+  contactRequestStatusEventHandler(socket);
 };
 const getEmailFromSocket = (socket) => {
   let token = socket.handshake.headers["token"];
@@ -60,6 +77,7 @@ const getEmailFromSocket = (socket) => {
 const handleConnection = () => {
   io.on("connection", (socket) => {
     console.log("User connected");
+    //socket.use(socketDataParserMiddleware);
     //let token = socket.handshake.headers["token"];
     let connectedUserEmail = getEmailFromSocket(socket);
     //Prevent multiple socket instances with same user
@@ -67,7 +85,7 @@ const handleConnection = () => {
       connectedUsers[connectedUserEmail].disconnect();
     }
     connectedUsers[connectedUserEmail] = socket;
-    console.log("Connected users:", connectedUsers);
+    //console.log("Connected users:", connectedUsers);
     //buffer check
     //contact requests
     //contactBuffer
@@ -75,37 +93,80 @@ const handleConnection = () => {
     handleEvents(socket);
   });
 };
+const contactRequestStatusEventHandler = async (socket) => {
+  socket.on("contactRequestStatus", async (data, callback) => {
+    data = JSON.parse(data);
+    let statusUser = userService.getUserByEmail(getEmailFromSocket(socket));
+    let contactRequestSender = userService.getUserByEmail(data.email);
+    let status = data.status;
+    if (status == "ACCEPT") {
+      connectedUsers[contactRequestSender.id].emit("contactRequestStatus", {
+        ...statusUser,
+        status: status,
+      });
+    } else {
+      connectedUsers[contactRequestSender.id].emit("contactRequestStatus", {
+        status: status,
+      });
+    }
+    console.log(
+      "Contact request status",
+      "Status User: ",
+      statusUser,
+      "Contact Request Sender: ",
+      contactRequestSender
+    );
+    //console.log("DATA ACCEPT:", data)
+    //console.log(
+    //"Accept contact request:",
+    //"From: ",
+    //socketUserEmail,
+    //"To: ",
+    //JSON.parse(data)?.email
+    //);
+  });
+};
 const acceptContactRequestEventHandler = async (socket) => {
   socket.on("acceptContactRequest", async (data, callback) => {
     let socketUserEmail = getEmailFromSocket(socket);
+    let contactEmail = JSON.parse(data)?.email;
+    console.log("DATA ACCEPT:", data);
     console.log(
       "Accept contact request:",
       "From: ",
       socketUserEmail,
       "To: ",
-      data.email
+      contactEmail
     );
+    let privateChat = await privateChatService.findByUsersIds(
+      await userService.getIdByEmail(socketUserEmail),
+      await userService.getIdByEmail(contactEmail)
+    );
+    await privateChatService.setActive(privateChat._id, true);
   });
 };
 const declineContactRequestEventHandler = async (socket) => {
   socket.on("declineContactRequest", async (data, callback) => {
     let socketUserEmail = getEmailFromSocket(socket);
+    let contactEmail = JSON.parse(data)?.email;
     console.log(
       "Decline contact request:",
       "From: ",
       socketUserEmail,
       "To: ",
-      data.email
+      contactEmail
     );
   });
 };
 const contactRequestEventHandler = async (socket) => {
   socket.on("sendContactRequest", async (data, callback) => {
     let socketUserEmail = getEmailFromSocket(socket);
-    let contactEmail = data?.email;
+    let contactEmail = JSON.parse(data).email;
+    console.log(contactEmail);
+    //let contactEmail = data.email;
     try {
       //Check user is exists or not
-      await userService.getUserByEmail(contactEmail);
+      let contactUser = await userService.getUserByEmail(contactEmail);
       if (!checkUserSocketAvailability(contactEmail))
         throw new Error("User not available!");
       let senderUser = await userService.getUserByEmail(socketUserEmail);
@@ -122,8 +183,20 @@ const contactRequestEventHandler = async (socket) => {
         "To: ",
         contactEmail
       );
+      let privateChatData = {
+        user1Id: await userService.getIdByEmail(socketUserEmail),
+        user2Id: await userService.getIdByEmail(contactEmail),
+        active: false,
+      };
+      //TODO check duplication
+      await privateChatService.insert(privateChatData);
       callback({
         status: "OK",
+        contactData: {
+          name: contactUser.name,
+          email: contactUser.email,
+          publicKey: contactUser.public_key,
+        },
       });
     } catch (err) {
       callback({

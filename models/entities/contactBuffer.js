@@ -10,6 +10,10 @@ const contactBufferSchema = new Schema({
     type: String,
     required: true,
   },
+  is_sender_notified: {
+    type: Boolean,
+    required: true,
+  },
 });
 let ContactBuffer = mongoose.model("ContactBuffer", contactBufferSchema);
 let schemaObj = ContactBuffer.obj;

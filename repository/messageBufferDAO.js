@@ -3,9 +3,9 @@ const { MessageBuffer } = require("../models/entities/messageBuffer");
 const getAll = () => {
   return MessageBuffer.find({});
 };
-const findOne = (messageBuffer) => {
+const findOne = (messageBufferDTO) => {
   return new Promise((resolve, reject) => {
-    MessageBuffer.findOne(messageBuffer).then((mb) => {
+    MessageBuffer.findOne(messageBufferDTO).then((mb) => {
       //null or undefined
       if (mb == null) {
         reject(new Error("MessageBuffer not found!"));
@@ -15,9 +15,9 @@ const findOne = (messageBuffer) => {
     });
   });
 };
-const findAll = (messageBuffer) => {
+const findAll = (messageBufferDTO) => {
   return new Promise((resolve, reject) => {
-    MessageBuffer.findOne(messageBuffer).then((mb) => {
+    MessageBuffer.findOne(messageBufferDTO).then((mb) => {
       //null or undefined
       if (mb == null) {
         reject(new Error("There isn't any messages in the buffer!"));
@@ -33,10 +33,13 @@ const deleteAll = () => {
 const deleteByReceiverEmail = (email) => {
   return MessageBuffer.remove({ receiver_email: email });
 };
+const deleteBySenderEmail = (email) => {
+  return MessageBuffer.remove({ sender_email: email });
+};
 const findById = (id) => {
   return MessageBuffer.findById(id);
 };
-const insert = (messageBuffer) => {
+const insert = (messageBufferDTO) => {
   return MessageBuffer.create(messageBuffer);
 };
 const updateById = (id, data) => {
@@ -49,6 +52,7 @@ module.exports = {
   findAll,
   deleteAll,
   deleteByReceiverEmail,
+  deleteBySenderEmail,
   findById,
   insert,
   updateById,
