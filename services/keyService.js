@@ -3,6 +3,8 @@ const {Buffer} = require("buffer")
 
 const validatePublicKey = (publicKey) => {
   try {
+    if(publicKey == null)
+      throw new Error("Public key is null!")
     crypto.createPublicKey({
       key: Buffer.from(publicKey, "base64"),
       type: "spki",
