@@ -19,7 +19,12 @@ userRouter
   .delete(userController.removeUser);
 
 userRouter.put("/update", userController.updateUser);
-userRouter.get("/getPublicKeyWithEmail", userController.getUserPublicKey);
+userRouter.get("/getUserDetails", userController.getUserDetails);
+userRouter.get("/getPublicKeyWithEmail", (req, res, next) => {
+  res
+    .status(403)
+    .json(generateMessage(true, "This endpoint removed! Use /user/getUserDetails instead"));
+});
 userRouter.get("/getUserByUserId", userController.getUserByUserId);
 userRouter.post(
   "/generateUnlimitedAuthToken",

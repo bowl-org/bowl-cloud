@@ -32,6 +32,13 @@ const getUserPublicKey = (email) => {
     throw new Error(err.message);
   });
 };
+const getUserDetails = (email) => {
+  return UserDAO.findOne({
+    email: email,
+  }).catch((err) => {
+    throw new Error(err.message);
+  });
+};
 const getUserByUserId = (userId) => {
   return UserDAO.findOne({
     _id: userId,
@@ -100,6 +107,7 @@ const updateUserDetailsById = async (userId, userDetail) => {
 };
 module.exports = {
   getAllUsers,
+  getUserDetails,
   removeAllUsers,
   removeUserByEmail,
   removeUserById,

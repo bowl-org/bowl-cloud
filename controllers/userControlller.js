@@ -22,6 +22,16 @@ const getUserPublicKey = (req, res, next) => {
     })
     .catch((err) => res.status(400).json(generateMessage(true, err.message)));
 };
+const getUserDetails = (req, res, next) => {
+  res.setHeader("Content-Type", "application/json");
+  userService
+    .getUserDetails(req.query.email)
+    .then((user) => {
+      let userDTO = mapToUserDTO(user)
+      res.status(200).json({ public_key: userDTO["public_key"], name: userDTO["name"] });
+    })
+    .catch((err) => res.status(400).json(generateMessage(true, err.message)));
+};
 const getUserByUserId = (req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   userService
@@ -107,6 +117,7 @@ const updateUser = async (req, res, next) => {
 module.exports = {
   getAllUsers,
   getUserPublicKey,
+  getUserDetails,
   getUserByUserId,
   generateUnlimitedAuthToken,
   removeAllUsers,
