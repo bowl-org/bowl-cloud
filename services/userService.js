@@ -14,8 +14,13 @@ const removeAllUsers = () => {
     throw new Error(err.message);
   });
 };
-const removeUserByEmail = (email) => {
+const removeUserByEmail = async (email) => {
   return UserDAO.deleteByEmail(email).catch((err) => {
+    throw new Error(err.message);
+  });
+};
+const removeUserById = async (id) => {
+  return UserDAO.deleteById(id).catch((err) => {
     throw new Error(err.message);
   });
 };
@@ -77,14 +82,32 @@ const updateUserKeyByEmail = async (email, publicKey) => {
     throw new Error(err.message);
   }
 };
+const updateUserDetailsById = async (userId, userDetail) => {
+  try {
+    let userData = {}
+    if (userDetail.public_key){
+      validationService.validatePublicKey(userDetail.public_key);
+      userData.public_key = userDetail.public_key
+    }
+    if (userDetail.name){
+      validationService.validateName(userDetail.name);
+      userData.name = userDetail.name
+    }
+    await UserDAO.updateById(userId, userData);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
 module.exports = {
   getAllUsers,
   removeAllUsers,
   removeUserByEmail,
+  removeUserById,
   getUserPublicKey,
   getUserByUserId,
   getUserByEmail,
   getIdByEmail,
   generateUnlimitedAuthTokenByEmail,
   updateUserKeyByEmail,
+  updateUserDetailsById,
 };

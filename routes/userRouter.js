@@ -16,15 +16,9 @@ userRouter
       .json(generateMessage(true, "POST operation not supported on /user"));
   })
   .put(userController.updateUserKeyByEmail)
-  .delete(userController.removeUserByEmail);
+  .delete(userController.removeUser);
 
-userRouter.put("/update", (req, res, next) => {
-  res
-    .status(403)
-    .json(
-      generateMessage(true, "Update user by auth token not implemented yet!")
-    );
-});
+userRouter.put("/update", userController.updateUser);
 userRouter.get("/getPublicKeyWithEmail", userController.getUserPublicKey);
 userRouter.get("/getUserByUserId", userController.getUserByUserId);
 userRouter.post(

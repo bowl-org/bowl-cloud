@@ -1,5 +1,6 @@
 const { generateMessage } = require("../util/messageGenerator");
 const userService = require("../services/userService");
+const authTokenService = require("../services/authTokenService");
 const { mapToUserDTO } = require("../models/dtos/userDto");
 
 const getAllUsers = (req, res, next) => {
@@ -49,8 +50,29 @@ const removeAllUsers = (req, res, next) => {
     })
     .catch((err) => res.status(400).json(generateMessage(true, err.message)));
 };
+
+const removeUser = (req, res, next) => {
+  res.setHeader("Content-Type", "application/json");
+  if (req.body.email) {
+    removeUserByEmail(req, res, next);
+  } else if (req.body.id) {
+    removeUserById(req, res, next)
+  } else {
+    res.status(400).json(generateMessage(true, "Email or id not given!"));
+  }
+};
+const removeUserById = (req, res ,next) => {
+  res.setHeader("Content-Type", "application/json");
+  userService
+    .removeUserById(req.body.id)
+    .then((user) => {
+      res.status(200).json(generateMessage(false, "User deleted!"));
+    })
+    .catch((err) => res.status(400).json(generateMessage(true, err.message)));
+};
 const removeUserByEmail = (req, res, next) => {
   res.setHeader("Content-Type", "application/json");
+
   userService
     .removeUserByEmail(req.body.email)
     .then((user) => {
@@ -62,11 +84,24 @@ const removeUserByEmail = (req, res, next) => {
 const updateUserKeyByEmail = (req, res, next) => {
   res.setHeader("Content-Type", "application/json");
   userService
-    .updateUserKeyByEmail(req.body.email,req.body.public_key)
+    .updateUserKeyByEmail(req.body.email, req.body.public_key)
     .then(() => {
       res.status(200).json(generateMessage(false, "User public key updated!"));
     })
     .catch((err) => res.status(400).json(generateMessage(true, err.message)));
+};
+const updateUser = async (req, res, next) => {
+  res.setHeader("Content-Type", "application/json");
+  try {
+    let userId = authTokenService.getUserIdFromToken(req.headers.authorization);
+    if (userId == null) {
+      throw new Error("Invalid auth token!");
+    }
+    await userService.updateUserDetailsById(userId, req.body);
+    res.status(200).json(generateMessage(false, "User updated!"));
+  } catch (err) {
+    res.status(400).json(generateMessage(true, err.message));
+  }
 };
 
 module.exports = {
@@ -75,6 +110,8 @@ module.exports = {
   getUserByUserId,
   generateUnlimitedAuthToken,
   removeAllUsers,
+  removeUser,
   removeUserByEmail,
   updateUserKeyByEmail,
+  updateUser,
 };

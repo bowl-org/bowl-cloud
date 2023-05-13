@@ -18,8 +18,13 @@ const findOne = (userDTO) => {
 const deleteAll = () => {
   return User.remove({});
 };
-const deleteByEmail = (email) => {
-  return User.remove({ email: email });
+const deleteByEmail = async(email) => {
+  let isDeleted = (await User.remove({ email: email })).deletedCount > 0;
+  if(!isDeleted) throw new Error("User delete failed! User email not found");
+};
+const deleteById = async(id) => {
+  let isDeleted = await User.findByIdAndRemove(id);
+  if(!isDeleted) throw new Error("User delete failed! User id not found");
 };
 const findById = (id) => {
   return User.findById(id);
@@ -27,8 +32,11 @@ const findById = (id) => {
 const insert = (userDTO) => {
   return User.create(userDTO);
 };
-const updateById = (id, data) => {
-  return User.findByIdAndUpdate(id, data);
+const updateById = async (id, data) => {
+  let user = await User.findByIdAndUpdate(id, data);
+  console.log("Updated user:", user)
+  if(!user) throw new Error("User update failed! User id not found");
+  return user;
 };
 const updateByEmail = async (email, data) => {
   let user = await findOne({ email: email });
@@ -40,6 +48,7 @@ module.exports = {
   findOne,
   deleteAll,
   deleteByEmail,
+  deleteById,
   findById,
   insert,
   updateById,

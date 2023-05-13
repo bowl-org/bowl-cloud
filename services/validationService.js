@@ -30,4 +30,4 @@ const validateUser = (user) => {
     throw err;
   }
 };
-module.exports = {validateUser, validatePassword, validateEmail, validatePublicKey};
+module.exports = {validateUser, validateName, validatePassword, validateEmail, validatePublicKey};
