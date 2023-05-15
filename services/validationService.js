@@ -14,7 +14,7 @@ const validatePassword = (password) => {
 };
 const validateName = (name) => {
   //Minimum 3 character
-  if (/^.{3,}$/.test(name)) {
+  if (/^.{3,}$/.test(name.trim())) {
     return;
   }
   throw new Error("Name validation failed! Name must be at least 3 characters long.");

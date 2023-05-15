@@ -92,11 +92,11 @@ const updateUserKeyByEmail = async (email, publicKey) => {
 const updateUserDetailsById = async (userId, userDetail) => {
   try {
     let userData = {}
-    if (userDetail.public_key){
+    if (userDetail.public_key != null){
       validationService.validatePublicKey(userDetail.public_key);
       userData.public_key = userDetail.public_key
     }
-    if (userDetail.name){
+    if (userDetail.name != null){
       validationService.validateName(userDetail.name);
       userData.name = userDetail.name
     }
