@@ -53,22 +53,52 @@ const handleEvents = (socket) => {
     //Data is only friend name for now
     socket.broadcast.emit("online", data);
   });
-  socket.on("chatMessage", (data) => {
-    console.log(data);
-    socket.broadcast.emit("chatMessage", data);
-    /*messageBufferController.sendMessage()
-    .then(())
-    */
-  });
   socket.on("disconnect", () => {
     console.log("User disconnected");
     delete connectedUsers[socket.id];
     console.log("Connected users when disconnect triggered:", connectedUsers);
   });
+  chatMessageHandler(socket);
+  globalMessageHandler(socket);
   contactRequestEventHandler(socket);
   acceptContactRequestEventHandler(socket);
   declineContactRequestEventHandler(socket);
   contactRequestStatusEventHandler(socket);
+};
+const chatMessageHandler = (socket) => {
+  socket.on("chatMessage", async (data, callback) => {
+    try {
+      data = JSON.parse(data);
+      let senderEmail = getEmailFromSocket(socket);
+      let contactEmail = data.to;
+      let contactSocket = connectedUsers[contactEmail];
+      if (contactSocket == null) throw new Error("Contact is not online!");
+      delete data.to;
+      contactSocket.emit(
+        "chatMessage",
+        JSON.stringify({ ...data, from: senderEmail })
+      );
+      if (typeof callback === "function")
+        callback({
+          status: "OK",
+        });
+    } catch (err) {
+      console.log(err.message);
+      if (typeof callback === "function")
+        callback({
+          status: "ERROR",
+          error: err.message,
+        });
+    }
+  });
+};
+const globalMessageHandler = (socket) => {
+  socket.on("globalMessage", (data) => {
+    socket.broadcast.emit("globalMessage", data);
+    /*messageBufferController.sendMessage()
+    .then(())
+    */
+  });
 };
 const getEmailFromSocket = (socket) => {
   let token = socket.handshake.headers["token"];
@@ -190,19 +220,21 @@ const contactRequestEventHandler = async (socket) => {
       };
       //TODO check duplication
       await privateChatService.insert(privateChatData);
-      callback({
-        status: "OK",
-        contactData: {
-          name: contactUser.name,
-          email: contactUser.email,
-          publicKey: contactUser.public_key,
-        },
-      });
+      if (typeof callback === "function")
+        callback({
+          status: "OK",
+          contactData: {
+            name: contactUser.name,
+            email: contactUser.email,
+            publicKey: contactUser.public_key,
+          },
+        });
     } catch (err) {
-      callback({
-        status: "ERROR",
-        error: err.message,
-      });
+      if (typeof callback === "function")
+        callback({
+          status: "ERROR",
+          error: err.message,
+        });
     }
   });
 };
