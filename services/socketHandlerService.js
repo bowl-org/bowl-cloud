@@ -49,13 +49,8 @@ const initSocket = (server) => {
   handleConnection();
 };
 const handleEvents = (socket) => {
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-    let userEmail = getEmailFromSocket(socket);
-    delete connectedUsers[userEmail];
-    console.log(userEmail, " disconnected!" );
-  });
-  onlineHandler(socket);
+  // onlineHandler(socket);
+  disconnectHandler(socket);
   chatMessageHandler(socket);
   globalMessageHandler(socket);
   contactRequestEventHandler(socket);
@@ -63,23 +58,44 @@ const handleEvents = (socket) => {
   declineContactRequestEventHandler(socket);
   contactRequestStatusEventHandler(socket);
 };
-const onlineHandler = (socket) => {
-  socket.on("online", async (data) => {
-    //data
-    //{privateChatEmails:[], groupKeyHashes:[]}
+const disconnectHandler = (socket) => {
+  socket.on("disconnect", async () => {
     let userEmail = getEmailFromSocket(socket);
     let userId = await userService.getIdByEmail(userEmail);
-    let contactChatEmails = await privateChatService.getContactEmails(userId);
-    //Send online message to all contacts
-    contactChatEmails
-      ?.filter((email) => connectedUsers.hasOwnProperty(email))
-      ?.forEach((email) => {
-        connectedUsers[email].emit("online", { email: userEmail });
-      });
-    //TODO group chats
-    // socket.broadcast.emit("online", data);
+    await emitToContacts(userId, "offline", { email: userEmail });
+    await emitToGroups(userId, "offline", { email: userEmail });
+    delete connectedUsers[userEmail];
+    console.log(userEmail, "disconnected!");
   });
-}
+};
+const emitToContacts = async (userId, eventName, payload) => {
+  let contactChatEmails = await privateChatService.getContactEmails(userId);
+  //Send online message to all contacts
+  contactChatEmails
+    ?.filter((email) => connectedUsers.hasOwnProperty(email))
+    ?.forEach((email) => {
+      connectedUsers[email].emit(eventName, payload);
+    });
+};
+const emitToGroups = async (userId, eventName, payload) => {
+  //TODO
+};
+const onlineEmitter = async (socket) => {
+  let userEmail = getEmailFromSocket(socket);
+  let userId = await userService.getIdByEmail(userEmail);
+  await emitToContacts(userId, "online", { email: userEmail });
+  await emitToGroups(userId, "online", { email: userEmail });
+};
+const getOnlineContactEmails = async (userId) => {
+  return (await privateChatService.getContactEmails(userId))?.filter((email) =>
+    connectedUsers.hasOwnProperty(email)
+  );
+};
+const getOnlineChats = async (userId) => {
+  let onlineContactEmails = await getOnlineContactEmails(userId);
+  //TODO groups
+  return { contacts: onlineContactEmails, groups: [] };
+};
 const chatMessageHandler = (socket) => {
   socket.on("chatMessage", async (data, callback) => {
     try {
@@ -119,8 +135,14 @@ const getEmailFromSocket = (socket) => {
   let token = socket.handshake.headers["token"];
   return authTokenService.getUserEmailFromToken(token);
 };
+const emitChatsToUser = async (socket) => {
+  let userEmail = getEmailFromSocket(socket);
+  let userId = await userService.getIdByEmail(userEmail);
+  //Return online chats data to user
+  socket.emit("onlineChats", await getOnlineChats(userId));
+};
 const handleConnection = () => {
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     console.log("User connected");
     //socket.use(socketDataParserMiddleware);
     //let token = socket.handshake.headers["token"];
@@ -130,12 +152,11 @@ const handleConnection = () => {
       connectedUsers[connectedUserEmail].disconnect();
     }
     connectedUsers[connectedUserEmail] = socket;
-    //console.log("Connected users:", connectedUsers);
-    //buffer check
-    //contact requests
-    //contactBuffer
-    //socket.emit("contactRequestReceived", senderData);
     handleEvents(socket);
+    //Send online message to chats
+    await onlineEmitter(socket);
+    //Send online chats to user
+    await emitChatsToUser(socket);
   });
 };
 const contactRequestStatusEventHandler = async (socket) => {
