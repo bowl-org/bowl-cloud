@@ -1,4 +1,5 @@
 const { PrivateChat } = require("../models/entities/privateChat");
+const { User } = require("../models/entities/user");
 
 const getAll = () => {
   return PrivateChat.find({});
@@ -15,6 +16,23 @@ const findOne = (privateChat) => {
       }
     });
   });
+};
+const getContactUserIds = async (userId) => {
+  return (
+    await PrivateChat.find()
+      .or([{ user1Id: userId }, { user2Id: userId }])
+      .select({
+        _id: 0,
+        userId: {
+          $cond: [{ $eq: ["$user1Id", userId] }, "$user2Id", "$user1Id"],
+        },
+      })
+      .lean()
+  ).map((data) => data.userId);
+};
+const getContactEmails = async (userId) => {
+  let contactUserIds = await getContactUserIds(userId);
+  return await User.find().where("_id").in(contactUserIds).distinct("email");
 };
 
 //Find private chat that two users talking with each other(Sequence of user id arguments does not matter)
@@ -93,4 +111,5 @@ module.exports = {
   findById,
   insert,
   setActive,
+  getContactEmails,
 };

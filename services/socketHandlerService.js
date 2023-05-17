@@ -49,15 +49,13 @@ const initSocket = (server) => {
   handleConnection();
 };
 const handleEvents = (socket) => {
-  socket.on("online", (data) => {
-    //Data is only friend name for now
-    socket.broadcast.emit("online", data);
-  });
   socket.on("disconnect", () => {
     console.log("User disconnected");
-    delete connectedUsers[socket.id];
-    console.log("Connected users when disconnect triggered:", connectedUsers);
+    let userEmail = getEmailFromSocket(socket);
+    delete connectedUsers[userEmail];
+    console.log(userEmail, " disconnected!" );
   });
+  onlineHandler(socket);
   chatMessageHandler(socket);
   globalMessageHandler(socket);
   contactRequestEventHandler(socket);
@@ -65,6 +63,23 @@ const handleEvents = (socket) => {
   declineContactRequestEventHandler(socket);
   contactRequestStatusEventHandler(socket);
 };
+const onlineHandler = (socket) => {
+  socket.on("online", async (data) => {
+    //data
+    //{privateChatEmails:[], groupKeyHashes:[]}
+    let userEmail = getEmailFromSocket(socket);
+    let userId = await userService.getIdByEmail(userEmail);
+    let contactChatEmails = await privateChatService.getContactEmails(userId);
+    //Send online message to all contacts
+    contactChatEmails
+      ?.filter((email) => connectedUsers.hasOwnProperty(email))
+      ?.forEach((email) => {
+        connectedUsers[email].emit("online", { email: userEmail });
+      });
+    //TODO group chats
+    // socket.broadcast.emit("online", data);
+  });
+}
 const chatMessageHandler = (socket) => {
   socket.on("chatMessage", async (data, callback) => {
     try {

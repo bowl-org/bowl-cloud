@@ -14,6 +14,19 @@ const findOne = (privateChat) => {
 const findByUsersIds = (user1Id, user2Id) => {
   return PrivateChatDAO.findByUsersIds(user1Id, user2Id);
 };
+const getContactEmails = async(userId) => {
+  try{
+  let contactEmails = await PrivateChatDAO.getContactEmails(userId);
+    console.log("Contact emails:", contactEmails)
+    if(contactEmails == null){
+      throw new Error("User does not have any private chat!")
+    }
+    return contactEmails;
+  }catch(err){
+    console.log(err.message);
+    throw new Error(err.message);
+  }
+}
 
 const findAll = (privateChat) => {
   let chat = mapToPrivateChatDTO(privateChat);
@@ -48,4 +61,5 @@ module.exports = {
   findById,
   insert,
   setActive,
+  getContactEmails
 };
