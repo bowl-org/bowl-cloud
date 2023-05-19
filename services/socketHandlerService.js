@@ -51,8 +51,9 @@ const initSocket = (server) => {
 const handleEvents = (socket) => {
   // onlineHandler(socket);
   disconnectHandler(socket);
-  chatMessageHandler(socket);
-  globalMessageHandler(socket);
+  contactChatMessageHandler(socket);
+  groupChatMessageHandler(socket);
+  globalChatMessageHandler(socket);
   contactRequestEventHandler(socket);
   acceptContactRequestEventHandler(socket);
   declineContactRequestEventHandler(socket);
@@ -96,17 +97,23 @@ const getOnlineChats = async (userId) => {
   //TODO groups
   return { contacts: onlineContactEmails, groups: [] };
 };
-const chatMessageHandler = (socket) => {
-  socket.on("chatMessage", async (data, callback) => {
+const groupChatMessageHandler = (socket) => {
+  socket.on("groupChatMessage", async (data, callback) => {
+    //TODO
+  });
+};
+const contactChatMessageHandler = (socket) => {
+  socket.on("contactChatMessage", async (data, callback) => {
     try {
       data = JSON.parse(data);
+      console.log("contactChatMessage:", data);
       let senderEmail = getEmailFromSocket(socket);
       let contactEmail = data.to;
       let contactSocket = connectedUsers[contactEmail];
       if (contactSocket == null) throw new Error("Contact is not online!");
       delete data.to;
       contactSocket.emit(
-        "chatMessage",
+        "contactChatMessage",
         JSON.stringify({ ...data, from: senderEmail })
       );
       if (typeof callback === "function")
@@ -123,9 +130,10 @@ const chatMessageHandler = (socket) => {
     }
   });
 };
-const globalMessageHandler = (socket) => {
-  socket.on("globalMessage", (data) => {
-    socket.broadcast.emit("globalMessage", data);
+const globalChatMessageHandler = (socket) => {
+  socket.on("globalChatMessage", (data) => {
+    socket.broadcast.emit("globalChatMessage", data);
+    //TODO
     /*messageBufferController.sendMessage()
     .then(())
     */
