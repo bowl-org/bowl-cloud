@@ -268,8 +268,8 @@ const contactRequestEventHandler = async (socket) => {
         user2Id: await userService.getIdByEmail(contactEmail),
         active: false,
       };
-      //TODO check duplication
-      if (!privateChatService.isPrivateChatExists(privateChatData)){
+      //Check duplication
+      if (! await privateChatService.isPrivateChatExists(privateChatData)){
         await privateChatService.insert(privateChatData);
       }else{
         console.log("Private chat duplication detected:", privateChatData);

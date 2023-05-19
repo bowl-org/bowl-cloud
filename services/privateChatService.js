@@ -1,8 +1,19 @@
 const PrivateChatDAO = require("../repository/privateChatDAO");
 const { mapToPrivateChatDTO } = require("../models/dtos/privateChatDTO");
+const userService = require("../services/userService");
 
 const getAll = () => {
   return PrivateChatDAO.getAll();
+};
+const getAllPrivateChatDetails = async () => {
+  let privateChatDetails = [];
+  let privateChats = await PrivateChatDAO.getAll().lean();
+  for (const privateChat of privateChats) {
+    let user1 = await userService.getUserByUserId(privateChat.user1Id);
+    let user2 = await userService.getUserByUserId(privateChat.user2Id);
+    privateChatDetails.push({ id: privateChat._id, user1, user2 });
+  }
+  return privateChatDetails;
 };
 
 const findOne = (privateChat) => {
@@ -14,19 +25,19 @@ const findOne = (privateChat) => {
 const findByUsersIds = (user1Id, user2Id) => {
   return PrivateChatDAO.findByUsersIds(user1Id, user2Id);
 };
-const getContactEmails = async(userId) => {
-  try{
-  let contactEmails = await PrivateChatDAO.getContactEmails(userId);
-    console.log("Contact emails:", contactEmails)
-    if(contactEmails == null){
-      throw new Error("User does not have any private chat!")
+const getContactEmails = async (userId) => {
+  try {
+    let contactEmails = await PrivateChatDAO.getContactEmails(userId);
+    console.log("Contact emails:", contactEmails);
+    if (contactEmails == null) {
+      throw new Error("User does not have any private chat!");
     }
     return contactEmails;
-  }catch(err){
+  } catch (err) {
     console.log(err.message);
     throw new Error(err.message);
   }
-}
+};
 
 const findAll = (privateChat) => {
   let chat = mapToPrivateChatDTO(privateChat);
@@ -50,20 +61,25 @@ const insert = (privateChatDTO) => {
 const setActive = (id, isActive) => {
   return PrivateChatDAO.setActive(id, isActive);
 };
-const isPrivateChatExists = (privateChatDTO) => {
-  return PrivateChatDAO.isPrivateChatExists(privateChatDTO);
+const isPrivateChatExists = async (privateChatDTO) => {
+  return await PrivateChatDAO.isPrivateChatExists(privateChatDTO);
+};
+const deleteById = async(privateChatId) => {
+  return PrivateChatDAO.deleteById(privateChatId);
 }
 
 module.exports = {
   getAll,
+  getAllPrivateChatDetails,
   findOne,
   findByUsersIds,
   findAll,
   deleteAll,
+  deleteById,
   deleteByUsersIds,
   findById,
   insert,
   setActive,
   getContactEmails,
-  isPrivateChatExists
+  isPrivateChatExists,
 };

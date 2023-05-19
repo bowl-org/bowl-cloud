@@ -100,17 +100,23 @@ const insert = (privateChatDTO) => {
 const setActive = (id, isActive) => {
   return PrivateChat.findByIdAndUpdate(id, { active: isActive });
 };
-const isPrivateChatExists = (privateChatDTO) => {
-  return (
-    PrivateChat.exists({
+const isPrivateChatExists = async (privateChatDTO) => {
+  let isExists =
+    ((await PrivateChat.exists({
       user1Id: privateChatDTO?.user1Id,
       user2Id: privateChatDTO?.user2Id,
-    }) ||
-    PrivateChat.exists({
-      user1Id: privateChatDTO?.user2Id,
-      user2Id: privateChatDTO?.user1Id,
-    })
-  );
+    }).exec()) ||
+      (await PrivateChat.exists({
+        user1Id: privateChatDTO?.user2Id,
+        user2Id: privateChatDTO?.user1Id,
+      }).exec())) != null;
+  console.log("Is exists:", isExists);
+  return isExists;
+};
+
+const deleteById = async (privateChatId) => {
+  let isDeleted = await PrivateChat.findByIdAndRemove(privateChatId);
+  if(!isDeleted) throw new Error("PrivateChat delete failed! PrivateChat id not found");
 };
 
 module.exports = {
@@ -125,4 +131,5 @@ module.exports = {
   setActive,
   getContactEmails,
   isPrivateChatExists,
+  deleteById,
 };
