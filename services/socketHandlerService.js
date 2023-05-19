@@ -73,7 +73,7 @@ const emitToContacts = async (userId, eventName, payload) => {
   let contactChatEmails = await privateChatService.getContactEmails(userId);
   //Send online message to all contacts
   contactChatEmails
-    ?.filter((email) => connectedUsers.hasOwnProperty(email))
+    ?.filter((email) => isOnline(email))
     ?.forEach((email) => {
       connectedUsers[email].emit(eventName, payload);
     });
@@ -89,7 +89,7 @@ const onlineEmitter = async (socket) => {
 };
 const getOnlineContactEmails = async (userId) => {
   return (await privateChatService.getContactEmails(userId))?.filter((email) =>
-    connectedUsers.hasOwnProperty(email)
+    isOnline(email)
   );
 };
 const getOnlineChats = async (userId) => {
@@ -156,7 +156,7 @@ const handleConnection = () => {
     //let token = socket.handshake.headers["token"];
     let connectedUserEmail = getEmailFromSocket(socket);
     //Prevent multiple socket instances with same user
-    if (checkUserSocketAvailability(connectedUserEmail)) {
+    if (isOnline(connectedUserEmail)) {
       connectedUsers[connectedUserEmail].disconnect();
     }
     connectedUsers[connectedUserEmail] = socket;
@@ -217,6 +217,13 @@ const acceptContactRequestEventHandler = async (socket) => {
       await userService.getIdByEmail(contactEmail)
     );
     await privateChatService.setActive(privateChat._id, true);
+    //Emit online messages if contact is online
+    if (isOnline(contactEmail)) {
+      //Notify contact that user become online
+      connectedUsers[contactEmail].emit("online", { email: socketUserEmail });
+      //Notify user that contact become online
+      connectedUsers[socketUserEmail].emit("online", { email: contactEmail });
+    }
   });
 };
 const declineContactRequestEventHandler = async (socket) => {
@@ -241,8 +248,7 @@ const contactRequestEventHandler = async (socket) => {
     try {
       //Check user is exists or not
       let contactUser = await userService.getUserByEmail(contactEmail);
-      if (!checkUserSocketAvailability(contactEmail))
-        throw new Error("User not available!");
+      if (!isOnline(contactEmail)) throw new Error("User not available!");
       let senderUser = await userService.getUserByEmail(socketUserEmail);
       let senderData = {
         name: senderUser.name,
@@ -282,9 +288,8 @@ const contactRequestEventHandler = async (socket) => {
     }
   });
 };
-const checkUserSocketAvailability = (email) =>
-  connectedUsers.hasOwnProperty(email);
+const isOnline = (email) => connectedUsers.hasOwnProperty(email);
 module.exports = {
   initSocket,
-  checkUserSocketAvailability,
+  isOnline,
 };
