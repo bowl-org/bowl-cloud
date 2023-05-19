@@ -100,6 +100,18 @@ const insert = (privateChatDTO) => {
 const setActive = (id, isActive) => {
   return PrivateChat.findByIdAndUpdate(id, { active: isActive });
 };
+const isPrivateChatExists = (privateChatDTO) => {
+  return (
+    PrivateChat.exists({
+      user1Id: privateChatDTO?.user1Id,
+      user2Id: privateChatDTO?.user2Id,
+    }) ||
+    PrivateChat.exists({
+      user1Id: privateChatDTO?.user2Id,
+      user2Id: privateChatDTO?.user1Id,
+    })
+  );
+};
 
 module.exports = {
   getAll,
@@ -112,4 +124,5 @@ module.exports = {
   insert,
   setActive,
   getContactEmails,
+  isPrivateChatExists,
 };

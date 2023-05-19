@@ -269,7 +269,11 @@ const contactRequestEventHandler = async (socket) => {
         active: false,
       };
       //TODO check duplication
-      await privateChatService.insert(privateChatData);
+      if (!privateChatService.isPrivateChatExists(privateChatData)){
+        await privateChatService.insert(privateChatData);
+      }else{
+        console.log("Private chat duplication detected:", privateChatData);
+      }
       if (typeof callback === "function")
         callback({
           status: "OK",

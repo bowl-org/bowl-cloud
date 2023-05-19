@@ -50,6 +50,9 @@ const insert = (privateChatDTO) => {
 const setActive = (id, isActive) => {
   return PrivateChatDAO.setActive(id, isActive);
 };
+const isPrivateChatExists = (privateChatDTO) => {
+  return PrivateChatDAO.isPrivateChatExists(privateChatDTO);
+}
 
 module.exports = {
   getAll,
@@ -61,5 +64,6 @@ module.exports = {
   findById,
   insert,
   setActive,
-  getContactEmails
+  getContactEmails,
+  isPrivateChatExists
 };
