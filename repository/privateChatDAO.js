@@ -94,8 +94,17 @@ const deleteByUsersIds = (user1Id, user2Id) => {
 const findById = (id) => {
   return PrivateChat.findById(id);
 };
-const insert = (privateChatDTO) => {
-  return PrivateChat.create(privateChatDTO);
+const insert = async (privateChatDTO) => {
+  try {
+    return await PrivateChat.create(privateChatDTO);
+  } catch (err) {
+    //Duplication error code
+    if (err?.code == 11000) {
+      throw new Error("Private chat already exists!");
+    } else {
+      throw err;
+    }
+  }
 };
 const setActive = (id, isActive) => {
   return PrivateChat.findByIdAndUpdate(id, { active: isActive });
@@ -116,7 +125,8 @@ const isPrivateChatExists = async (privateChatDTO) => {
 
 const deleteById = async (privateChatId) => {
   let isDeleted = await PrivateChat.findByIdAndRemove(privateChatId);
-  if(!isDeleted) throw new Error("PrivateChat delete failed! PrivateChat id not found");
+  if (!isDeleted)
+    throw new Error("PrivateChat delete failed! PrivateChat id not found");
 };
 
 module.exports = {

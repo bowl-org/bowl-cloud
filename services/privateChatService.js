@@ -54,7 +54,7 @@ const deleteByUsersIds = (user1Id, user2Id) => {
 const findById = (id) => {
   return PrivateChatDAO.findById(id);
 };
-const insert = (privateChatDTO) => {
+const insert = async(privateChatDTO) => {
   let chat = mapToPrivateChatDTO(privateChatDTO);
   return PrivateChatDAO.insert(chat);
 };

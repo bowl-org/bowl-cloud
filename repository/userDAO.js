@@ -29,6 +29,9 @@ const deleteById = async(id) => {
 const findById = (id) => {
   return User.findById(id);
 };
+const findByIds = async(userIds) => {
+  return await User.find({}).where('_id').in(userIds).lean();
+}
 const insert = (userDTO) => {
   return User.create(userDTO);
 };
@@ -42,6 +45,9 @@ const updateByEmail = async (email, data) => {
   let user = await findOne({ email: email });
   return User.findByIdAndUpdate(user.id, data);
 };
+const isExists = async(userId) => {
+  return (await User.exists({_id: userId}).exec()) != null
+}
 
 module.exports = {
   getAll,
@@ -50,7 +56,9 @@ module.exports = {
   deleteByEmail,
   deleteById,
   findById,
+  findByIds,
   insert,
   updateById,
-  updateByEmail
+  updateByEmail,
+  isExists
 };

@@ -10,12 +10,17 @@ groupChatRouter.use(express.json());
 groupChatRouter
   .route("/")
   .get(groupChatController.getAllGroupChats)
-  .post((req, res, next) => {
-    res
-      .status(403)
-      .json(generateMessage(true, "POST operation not supported on /privateChat"));
-  })
-  // .put(groupChatController.updateUserKeyByEmail)
-  // .delete(groupChatController.removeUser);
+  .post(groupChatController.createGroupChat)
+  .put(groupChatController.updateGroupChat)
+  .delete(groupChatController.removeGroupChat);
+groupChatRouter.get("/groupMember", groupChatController.getAllMembersOfGroup)
+groupChatRouter.post("/groupMember", groupChatController.addMemberToGroup)
+groupChatRouter.put("/groupMember", groupChatController.setAdminStatusOfMember)
+groupChatRouter.delete("/groupMember", groupChatController.removeGroupMember)
+
+//DEV
+groupChatRouter.get("/members", groupChatController.getAllMembers)
+groupChatRouter.delete("/members", groupChatController.deleteAllMembers)
+groupChatRouter.get("/relationalMembers", groupChatController.getAllRelationalMembersEmailOfUser)
 
 module.exports = groupChatRouter;

@@ -3,6 +3,7 @@ require("dotenv").config();
 const env = process.env;
 const authTokenService = require("./authTokenService");
 const userService = require("./userService");
+const groupChatService = require("./groupChatService");
 const privateChatService = require("./privateChatService");
 const { mapToUserDTO } = require("../models/dtos/userDto");
 // const messageBufferC
@@ -11,6 +12,11 @@ const { mapToUserDTO } = require("../models/dtos/userDto");
 let io;
 let connectedUsers = {};
 
+const joinToChannelIfOnline = async (userId, groupId) => {
+  let user = await userService.getUserByUserId(userId);
+  let onlineStatus = isOnline(user.email);
+  if (onlineStatus) connectedUsers[user.email].join(groupId);
+};
 const authSocketMiddleware = (socket, next) => {
   authTokenService
     .verifyAuthToken(socket.handshake.headers["token"])
@@ -58,15 +64,22 @@ const handleEvents = (socket) => {
   acceptContactRequestEventHandler(socket);
   declineContactRequestEventHandler(socket);
   contactRequestStatusEventHandler(socket);
+  acceptGroupRequestEventHandler(socket);
+  declineGroupRequestEventHandler(socket);
+  groupRequestEventHandler(socket);
 };
 const disconnectHandler = (socket) => {
   socket.on("disconnect", async () => {
-    let userEmail = getEmailFromSocket(socket);
-    let userId = await userService.getIdByEmail(userEmail);
-    await emitToContacts(userId, "offline", { email: userEmail });
-    await emitToGroups(userId, "offline", { email: userEmail });
-    delete connectedUsers[userEmail];
-    console.log(userEmail, "disconnected!");
+    try {
+      let userEmail = getEmailFromSocket(socket);
+      let userId = await userService.getIdByEmail(userEmail);
+      await emitToContacts(userId, "offline", { email: userEmail });
+      await emitToGroups(userId, "offline", { email: userEmail });
+      delete connectedUsers[userEmail];
+      console.log(userEmail, "disconnected!");
+    } catch (err) {
+      console.log("Disconnect handler error:", err);
+    }
   });
 };
 const emitToContacts = async (userId, eventName, payload) => {
@@ -79,7 +92,13 @@ const emitToContacts = async (userId, eventName, payload) => {
     });
 };
 const emitToGroups = async (userId, eventName, payload) => {
-  //TODO
+  let associatedGroupIds = await groupChatService.getGroupsOfUser(userId);
+  associatedGroupIds?.forEach((groupId) =>
+    io.to(groupId).emit(eventName, payload)
+  );
+};
+const emitToGivenGroup = async (groupId, eventName, payload) => {
+  io.to(groupId).emit(eventName, payload);
 };
 const onlineEmitter = async (socket) => {
   let userEmail = getEmailFromSocket(socket);
@@ -92,14 +111,50 @@ const getOnlineContactEmails = async (userId) => {
     isOnline(email)
   );
 };
+const getOnlineGroupDatas = async (userId) => {
+  let groupDatas = await groupChatService.getAllRelationalMembersEmailOfUser(
+    userId
+  );
+  for (const data of groupDatas) {
+    data.persons = data.persons.filter((email) => isOnline(email));
+  }
+  return groupDatas;
+};
 const getOnlineChats = async (userId) => {
   let onlineContactEmails = await getOnlineContactEmails(userId);
-  //TODO groups
-  return { contacts: onlineContactEmails, groups: [] };
+  let onlineGroupDatas = await getOnlineGroupDatas(userId);
+  return { contacts: onlineContactEmails, groups: onlineGroupDatas };
+};
+const isUserInGroup = (socket, groupId) => {
+  //socket.rooms type is set
+  return socket.rooms.has(groupId);
 };
 const groupChatMessageHandler = (socket) => {
   socket.on("groupChatMessage", async (data, callback) => {
-    //TODO
+    try {
+      data = JSON.parse(data);
+      console.log("groupChatMessage:", data);
+      let senderEmail = getEmailFromSocket(socket);
+      let groupId = data?.groupId;
+      if (!isUserInGroup(socket, groupId))
+        throw new Error("User not in given group!");
+      emitToGivenGroup(
+        groupId,
+        "groupChatMessage",
+        JSON.stringify({ ...data, from: senderEmail })
+      );
+      if (typeof callback === "function")
+        callback({
+          status: "OK",
+        });
+    } catch (err) {
+      console.log(err.message);
+      if (typeof callback === "function")
+        callback({
+          status: "ERROR",
+          error: err.message,
+        });
+    }
   });
 };
 const contactChatMessageHandler = (socket) => {
@@ -163,9 +218,22 @@ const handleConnection = () => {
     handleEvents(socket);
     //Send online message to chats
     await onlineEmitter(socket);
+    //Init groups after send online messages
+    await initGroupRooms(socket);
     //Send online chats to user
     await emitChatsToUser(socket);
   });
+};
+const initGroupRooms = async (socket) => {
+  let userEmail = getEmailFromSocket(socket);
+  let userId = await userService.getIdByEmail(userEmail);
+
+  let associatedGroupIds = await groupChatService.getGroupsOfUser(userId);
+  //Join group rooms
+  for (const groupId of associatedGroupIds) {
+    console.log("GroupID:", groupId);
+    socket.join(`${groupId}`);
+  }
 };
 const contactRequestStatusEventHandler = async (socket) => {
   socket.on("contactRequestStatus", async (data, callback) => {
@@ -190,14 +258,6 @@ const contactRequestStatusEventHandler = async (socket) => {
       "Contact Request Sender: ",
       contactRequestSender
     );
-    //console.log("DATA ACCEPT:", data)
-    //console.log(
-    //"Accept contact request:",
-    //"From: ",
-    //socketUserEmail,
-    //"To: ",
-    //JSON.parse(data)?.email
-    //);
   });
 };
 const acceptContactRequestEventHandler = async (socket) => {
@@ -226,17 +286,144 @@ const acceptContactRequestEventHandler = async (socket) => {
     }
   });
 };
+const newGroupMemberEvent = async (groupId, userEmail) => {
+  let user = await userService.getUserByEmail(userEmail);
+  await emitToGivenGroup(groupId, "newGroupMember", {
+    groupId: groupId,
+    name: user.name,
+    email: user.email,
+    publicKey: user.public_key,
+  });
+};
+const acceptGroupRequestEventHandler = async (socket) => {
+  socket.on("acceptGroupRequest", async (data, callback) => {
+    try {
+      let socketUserEmail = getEmailFromSocket(socket);
+      let groupId = JSON.parse(data)?.groupId;
+      console.log("Accept group request:", {
+        userEmail: socketUserEmail,
+        groupId: groupId,
+      });
+      let groupMember = {
+        userId: await userService.getIdByEmail(socketUserEmail),
+        groupId: groupId,
+      };
+      //Get group members before add member to group
+      let groupMembers = await groupChatService.getAllMemberDetailsOfGroup(
+        groupId
+      );
+      await groupChatService.addMemberToGroup(groupMember);
+      //Don't send his own online message to user
+      await newGroupMemberEvent(groupId, socketUserEmail);
+      await emitToGivenGroup(groupId, "online", { email: socketUserEmail });
+      socket.join(groupId);
+      if (typeof callback === "function")
+        callback({
+          status: "OK",
+          members: groupMembers,
+        });
+    } catch (err) {
+      if (typeof callback === "function")
+        callback({
+          status: "ERROR",
+          error: err.message,
+        });
+    }
+  });
+};
 const declineContactRequestEventHandler = async (socket) => {
   socket.on("declineContactRequest", async (data, callback) => {
-    let socketUserEmail = getEmailFromSocket(socket);
-    let contactEmail = JSON.parse(data)?.email;
-    console.log(
-      "Decline contact request:",
-      "From: ",
-      socketUserEmail,
-      "To: ",
-      contactEmail
-    );
+    try {
+      let socketUserEmail = getEmailFromSocket(socket);
+      let contactEmail = JSON.parse(data)?.email;
+      console.log(
+        "Decline contact request:",
+        "From: ",
+        socketUserEmail,
+        "To: ",
+        contactEmail
+      );
+      if (typeof callback === "function")
+        callback({
+          status: "OK",
+        });
+    } catch (err) {
+      if (typeof callback === "function")
+        callback({
+          status: "ERROR",
+          error: err.message,
+        });
+    }
+  });
+};
+const declineGroupRequestEventHandler = async (socket) => {
+  socket.on("declineGroupRequest", async (data, callback) => {
+    try {
+      let socketUserEmail = getEmailFromSocket(socket);
+      let groupId = JSON.parse(data)?.groupId;
+      console.log("Decline group request:", {
+        userEmail: socketUserEmail,
+        groupId: groupId,
+      });
+      if (typeof callback === "function")
+        callback({
+          status: "OK",
+        });
+    } catch (err) {
+      if (typeof callback === "function")
+        callback({
+          status: "ERROR",
+          error: err.message,
+        });
+    }
+  });
+};
+const groupRequestEventHandler = async (socket) => {
+  socket.on("sendGroupRequest", async (data, callback) => {
+    // let socketUserEmail = getEmailFromSocket(socket);
+    let groupRequestData = JSON.parse(data);
+    console.log("Group request:", groupRequestData);
+    try {
+      //Check user is exists or not
+      let targetUser = await userService.getUserByEmail(groupRequestData.email);
+      if (!isOnline(groupRequestData.email))
+        throw new Error("User not available!");
+      let group = await groupChatService.findById(groupRequestData.groupId);
+      let groupData = {
+        name: group.name,
+        description: group.description,
+        groupId: groupRequestData.groupId,
+        encryptedGroupKey: groupRequestData.encryptedGroupKey,
+      };
+      connectedUsers[targetUser.email].emit("groupRequestReceived", groupData);
+      console.log(
+        "Group request sent to:",
+        groupData,
+        " to:",
+        targetUser.email
+      );
+      // let groupMember = {
+      //   userId: await userService.getIdByEmail(targetUser.email),
+      //   groupId: groupData.groupId,
+      // };
+      // await groupChatService.addMemberToGroup(groupMember);
+      if (typeof callback === "function")
+        callback({
+          status: "OK",
+          // personData: {
+          //   name: targetUser.name,
+          //   email: targetUser.email,
+          //   publicKey: targetUser.public_key,
+          // },
+        });
+    } catch (err) {
+      console.log(err);
+      if (typeof callback === "function")
+        callback({
+          status: "ERROR",
+          error: err.message,
+        });
+    }
   });
 };
 const contactRequestEventHandler = async (socket) => {
@@ -269,9 +456,9 @@ const contactRequestEventHandler = async (socket) => {
         active: false,
       };
       //Check duplication
-      if (! await privateChatService.isPrivateChatExists(privateChatData)){
+      if (!(await privateChatService.isPrivateChatExists(privateChatData))) {
         await privateChatService.insert(privateChatData);
-      }else{
+      } else {
         console.log("Private chat duplication detected:", privateChatData);
       }
       if (typeof callback === "function")
@@ -296,4 +483,5 @@ const isOnline = (email) => connectedUsers.hasOwnProperty(email);
 module.exports = {
   initSocket,
   isOnline,
+  joinToChannelIfOnline,
 };

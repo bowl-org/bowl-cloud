@@ -20,6 +20,7 @@ const forgotPasswordRouter = require("./routes/forgotPasswordRouter");
 const verifyRouter = require("./routes/verifyRouter");
 const userRouter = require("./routes/userRouter");
 const privateChatRouter = require("./routes/privateChatRouter");
+const groupChatRouter = require("./routes/groupChatRouter");
 
 // We will not pass endpoint from nginx, api key will be handled in nginx side
 //const wss = new WebSocket.Server({ server: server }, () => {
@@ -49,6 +50,8 @@ app.use(`${env.API_TOKEN}/verify`, verifyRouter);
 app.use(`${env.API_TOKEN}/user`, userRouter);
 // Private chat router mounted as /privateChat
 app.use(`${env.API_TOKEN}/privateChat`, privateChatRouter);
+// Group chat router mounted as /groupChatRouter
+app.use(`${env.API_TOKEN}/groupChat`, groupChatRouter);
 app.get("/", (req, res) => {
   res.send("<h1>Bowl Backend</h1>");
 });

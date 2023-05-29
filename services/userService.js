@@ -77,6 +77,7 @@ const generateUnlimitedAuthTokenByEmail = (email) => {
           });
       })
       .catch((err) => {
+            console.log(err)
         reject(new Error(err.message));
       });
   });
@@ -105,6 +106,12 @@ const updateUserDetailsById = async (userId, userDetail) => {
     throw new Error(err.message);
   }
 };
+
+const checkUserExistence = async(userId) => {
+  let isUserExists = await UserDAO.isExists(userId);
+  if(!isUserExists)
+    throw new Error("User not exists!");
+}
 module.exports = {
   getAllUsers,
   getUserDetails,
@@ -118,4 +125,5 @@ module.exports = {
   generateUnlimitedAuthTokenByEmail,
   updateUserKeyByEmail,
   updateUserDetailsById,
+  checkUserExistence
 };
