@@ -9,7 +9,8 @@ const signUpNewUser = (userData) => {
   return new Promise((resolve, reject) => {
     let user = mapToUserDTO(userData);
     try {
-      validationService.validateUser(user);
+      let publicKey = validationService.validateUser(user);
+      user.public_key = publicKey;
       encryptionService.encryptPassword(user.password).then((hash) => {
         user.password = hash;
         UserDAO.insert(user)

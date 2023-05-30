@@ -25,7 +25,7 @@ const validateUser = (user) => {
     validateEmail(user.email);
     validateName(user.name);
     validatePassword(user.password);
-    validatePublicKey(user.public_key);
+    return validatePublicKey(user.public_key);
   } catch (err) {
     throw err;
   }

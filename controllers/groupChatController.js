@@ -8,7 +8,7 @@ const createGroupChat = async (req, res, next) => {
   try {
     let userId = await authorizationService.checkAuthTokenThenGetUserId(req.headers.authorization);
     let group = await groupChatService.createGroup(userId, req.body);
-    await socketHandlerService.joinToChannelIfOnline(userId, group.groupId );
+    await socketHandlerService.joinToChannelIfOnline(userId, group.groupId.toString() );
     res.status(200).json(group);
   } catch (err) {
     res.status(400).json(generateMessage(true, err.message));

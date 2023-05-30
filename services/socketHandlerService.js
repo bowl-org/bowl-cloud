@@ -15,7 +15,10 @@ let connectedUsers = {};
 const joinToChannelIfOnline = async (userId, groupId) => {
   let user = await userService.getUserByUserId(userId);
   let onlineStatus = isOnline(user.email);
-  if (onlineStatus) connectedUsers[user.email].join(groupId);
+  if (onlineStatus) {
+    connectedUsers[user.email].join(groupId);
+    console.log(user.email, "joined to group id:", groupId);
+  }
 };
 const authSocketMiddleware = (socket, next) => {
   authTokenService
@@ -100,6 +103,9 @@ const emitToGroups = async (userId, eventName, payload) => {
 const emitToGivenGroup = async (groupId, eventName, payload) => {
   io.to(groupId).emit(eventName, payload);
 };
+const emitToGivenGroupExcludingSender = async (senderSocket, groupId, eventName, payload) => {
+  senderSocket.to(groupId).emit(eventName, payload);
+};
 const onlineEmitter = async (socket) => {
   let userEmail = getEmailFromSocket(socket);
   let userId = await userService.getIdByEmail(userEmail);
@@ -138,7 +144,8 @@ const groupChatMessageHandler = (socket) => {
       let groupId = data?.groupId;
       if (!isUserInGroup(socket, groupId))
         throw new Error("User not in given group!");
-      emitToGivenGroup(
+      emitToGivenGroupExcludingSender(
+        socket,
         groupId,
         "groupChatMessage",
         JSON.stringify({ ...data, from: senderEmail })

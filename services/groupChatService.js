@@ -51,9 +51,13 @@ const getAllRelationalMembersEmailOfUser = async (userId) => {
         persons: [],
       };
       for (const member of data[groupId]) {
-        let user = await userService.getUserByUserId(member.userId);
-        groupData.persons.push(user.email);
-        res.push(groupData);
+        try {
+          let user = await userService.getUserByUserId(member.userId);
+          groupData.persons.push(user.email);
+          res.push(groupData);
+        } catch (err) {
+          console.log("Group member "+ member + " not found!")
+        }
       }
     }
 
@@ -84,6 +88,7 @@ const createGroup = async (userId, groupChatData) => {
   };
   try {
     await GroupChatDAO.addGroupMemberToGroup(group._id, adminData);
+    console.log("Create group id:", group._id);
     return {
       groupId: group._id,
       name: group.name,
@@ -144,10 +149,12 @@ const getAllMemberDetailsOfGroup = async (groupChatId) => {
 };
 const addMemberToGroup = async (groupMemberData) => {
   let groupMember = mapToGroupMemberDTO(groupMemberData);
-  return await GroupChatDAO.addGroupMemberToGroup(
+  let demo = await GroupChatDAO.addGroupMemberToGroup(
     groupMember.groupId,
     groupMember
   );
+  console.log("Add member to group:", demo);
+  return demo;
 };
 const setAdminStatusOfMember = async (groupMemberData) => {
   let groupMember = mapToGroupMemberDTO(groupMemberData);
