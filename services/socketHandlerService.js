@@ -103,7 +103,12 @@ const emitToGroups = async (userId, eventName, payload) => {
 const emitToGivenGroup = async (groupId, eventName, payload) => {
   io.to(groupId).emit(eventName, payload);
 };
-const emitToGivenGroupExcludingSender = async (senderSocket, groupId, eventName, payload) => {
+const emitToGivenGroupExcludingSender = async (
+  senderSocket,
+  groupId,
+  eventName,
+  payload
+) => {
   senderSocket.to(groupId).emit(eventName, payload);
 };
 const onlineEmitter = async (socket) => {
@@ -387,15 +392,22 @@ const declineGroupRequestEventHandler = async (socket) => {
 };
 const groupRequestEventHandler = async (socket) => {
   socket.on("sendGroupRequest", async (data, callback) => {
-    // let socketUserEmail = getEmailFromSocket(socket);
+    let socketUserEmail = getEmailFromSocket(socket);
     let groupRequestData = JSON.parse(data);
     console.log("Group request:", groupRequestData);
     try {
+      let senderUser = await userService.getUserByEmail(socketUserEmail);
       //Check user is exists or not
       let targetUser = await userService.getUserByEmail(groupRequestData.email);
       if (!isOnline(groupRequestData.email))
         throw new Error("User not available!");
       let group = await groupChatService.findById(groupRequestData.groupId);
+      let isSenderAdmin = await groupChatService.isMemberAdmin(
+        senderUser.id,
+        group.id
+      );
+      if (!isSenderAdmin)
+        throw new Error("Only admins can send group requests!");
       let groupData = {
         name: group.name,
         description: group.description,
@@ -409,19 +421,9 @@ const groupRequestEventHandler = async (socket) => {
         " to:",
         targetUser.email
       );
-      // let groupMember = {
-      //   userId: await userService.getIdByEmail(targetUser.email),
-      //   groupId: groupData.groupId,
-      // };
-      // await groupChatService.addMemberToGroup(groupMember);
       if (typeof callback === "function")
         callback({
           status: "OK",
-          // personData: {
-          //   name: targetUser.name,
-          //   email: targetUser.email,
-          //   publicKey: targetUser.public_key,
-          // },
         });
     } catch (err) {
       console.log(err);

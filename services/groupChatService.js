@@ -181,4 +181,5 @@ module.exports = {
   getAllMembersOfGroup,
   getAllMembers,
   setAdminStatusOfMember,
+  isMemberAdmin
 };
