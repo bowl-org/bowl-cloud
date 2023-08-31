@@ -34,15 +34,6 @@ const authSocketMiddleware = (socket, next) => {
       next(err);
     });
 };
-//const socketDataParserMiddleware = (socket, next) => {
-//try {
-//console.log("DATA PARSER TEST:",socket.data);
-//next();
-//} catch (err) {
-//next(err);
-//}
-//};
-//const parseSocketData = (data) => JSON.parse(data)
 
 const initSocket = (server) => {
   io = new Server(server, {
@@ -220,7 +211,6 @@ const handleConnection = () => {
   io.on("connection", async (socket) => {
     console.log("User connected");
     //socket.use(socketDataParserMiddleware);
-    //let token = socket.handshake.headers["token"];
     let connectedUserEmail = getEmailFromSocket(socket);
     //Prevent multiple socket instances with same user
     if (isOnline(connectedUserEmail)) {
